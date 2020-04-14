@@ -1,5 +1,5 @@
-const bson = require('bson')
-const logger = require('../../logging/logger')
+const bson = require('bson');
+const logger = require('../../logging/logger');
 
 class Report {
   /**
@@ -7,10 +7,10 @@ class Report {
    * @param {{userId: ObjectId, reportReason: number}|Report} object
    */
   constructor (object) {
-    this._id = object._id
-    this.userId = object.userId
-    this.reportReason = object.reportReason
-    this.description = object.description
+    this._id = object._id;
+    this.userId = object.userId;
+    this.reportReason = object.reportReason;
+    this.description = object.description;
   }
 
   /**
@@ -30,70 +30,70 @@ class Report {
   static async createReport (threadId, report, threadCollection) {
     const func = async () => {
       try {
-        let response
-        const threadObjectId = bson.ObjectId.createFromHexString(threadId)
-        let filter = { _id: threadObjectId, 'reports.userId': report.userId }
-        const thread = await threadCollection.findOne(filter)
+        let response;
+        const threadObjectId = bson.ObjectId.createFromHexString(threadId);
+        let filter = { _id: threadObjectId, 'reports.userId': report.userId };
+        const thread = await threadCollection.findOne(filter);
         if (thread == null) {
-          filter = { _id: threadObjectId }
-          report._id = new bson.ObjectID(bson.ObjectID.generate())
-          const query = { $push: { reports: report } }
-          const res = await threadCollection.updateOne(filter, query)
+          filter = { _id: threadObjectId };
+          report._id = new bson.ObjectID(bson.ObjectID.generate());
+          const query = { $push: { reports: report } };
+          const res = await threadCollection.updateOne(filter, query);
           if (res.modifiedCount === 1) {
-            response = { status: true, reportId: report._id.toHexString(), msg: 'success' }
-            logger.debug(`Reported report_id:${report._id.toHexString()}`)
+            response = { status: true, reportId: report._id.toHexString(), msg: 'success' };
+            logger.debug(`Reported report_id:${report._id.toHexString()}`);
           } else {
-            logger.warn(`Unable to report threadId:${threadId} userId:${report.userId.toHexString()}`)
-            response = { status: false, err: `matched:${res.matchedCount} modified:${res.modifiedCount}` }
+            logger.warn(`Unable to report threadId:${threadId} userId:${report.userId.toHexString()}`);
+            response = { status: false, err: `matched:${res.matchedCount} modified:${res.modifiedCount}` };
           }
         } else {
-          response = { status: false, err: 'already reported' }
-          logger.debug(`Already reported thread_id:${threadId} user_id:${report.userId.toHexString()}`)
+          response = { status: false, err: 'already reported' };
+          logger.debug(`Already reported thread_id:${threadId} user_id:${report.userId.toHexString()}`);
         }
-        return response
+        return response;
       } catch (e) {
-        const response = { status: false, err: e.message }
-        logger.error('Error in creating report for the users')
-        return response
+        const response = { status: false, err: e.message };
+        logger.error('Error in creating report for the users');
+        return response;
       }
-    }
-    return func()
+    };
+    return func();
   }
 
   static async createReplyReport (replyId, report, replyCollection) {
     try {
-      let response
-      const replyObjectId = bson.ObjectID.createFromHexString(replyId)
+      let response;
+      const replyObjectId = bson.ObjectID.createFromHexString(replyId);
       let filter = {
         _id: replyObjectId,
         'reports.userId': report.userId
-      }
-      const reply = await replyCollection.findOne(filter)
+      };
+      const reply = await replyCollection.findOne(filter);
       if (reply == null) {
         filter = {
           _id: replyObjectId
-        }
-        report._id = new bson.ObjectID(bson.ObjectID.generate())
-        const query = { $push: { reports: report } }
-        const res = await replyCollection.updateOne(filter, query)
+        };
+        report._id = new bson.ObjectID(bson.ObjectID.generate());
+        const query = { $push: { reports: report } };
+        const res = await replyCollection.updateOne(filter, query);
         if (res.modifiedCount === 1) {
-          response = { status: true, reportId: report._id.toHexString(), msg: 'success' }
-          logger.debug(`Reported report_id:${report._id.toHexString()}`)
+          response = { status: true, reportId: report._id.toHexString(), msg: 'success' };
+          logger.debug(`Reported report_id:${report._id.toHexString()}`);
         } else {
-          logger.warn(`Unable to report replyId:${replyId} userId:${report.userId.toHexString()}`)
-          response = { status: false, err: `matched:${res.matchedCount} modified:${res.modifiedCount}` }
+          logger.warn(`Unable to report replyId:${replyId} userId:${report.userId.toHexString()}`);
+          response = { status: false, err: `matched:${res.matchedCount} modified:${res.modifiedCount}` };
         }
       } else {
-        response = { status: false, err: 'already reported' }
-        logger.debug(`Already reported replyId:${replyId}  user_id:${report.userId.toHexString()}`)
+        response = { status: false, err: 'already reported' };
+        logger.debug(`Already reported replyId:${replyId}  user_id:${report.userId.toHexString()}`);
       }
-      return response
+      return response;
     } catch (e) {
-      const response = { status: false, err: e.message }
-      logger.error(`Error in creating report for the user and reply:${replyId}`)
-      return response
+      const response = { status: false, err: e.message };
+      logger.error(`Error in creating report for the user and reply:${replyId}`);
+      return response;
     }
   }
 }
 
-module.exports = Report
+module.exports = Report;

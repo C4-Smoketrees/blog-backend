@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "lint": "standard",
-    "test": "mocha ./test/*",
+    "lint": "semistandard --fix",
+    "test": "semistandard && mocha ./test/*",
     "coverage": "nyc mocha ./test/*",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov"
   },
@@ -40,8 +40,8 @@
     "chai-http": "^4.3.0",
     "mocha": "^7.1.1",
     "nodemon": "^2.0.2",
-    "sleep": "^6.1.0",
-    "standard": "^14.3.1"
+    "semistandard": "^14.2.0",
+    "sleep": "^6.1.0"
   },
   "nyc": {
     "all": true,

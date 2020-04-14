@@ -1,33 +1,33 @@
-const fetch = require('node-fetch')
-const agent = require('./agent')
-const url = require('./url')
+const fetch = require('node-fetch');
+const agent = require('./agent');
+const url = require('./url');
 
 async function getOneThread (threadId, token) {
-  let auth = ''
+  let auth = '';
   if (token) {
-    auth = token
+    auth = token;
   }
   const res = await fetch(`${url}/threads/one?threadId=${threadId}`, {
     method: 'GET',
     headers: { Authorization: auth },
     agent
-  })
-  const body = res.json()
-  return body
+  });
+  const body = res.json();
+  return body;
 }
 
 async function getAllThread (token) {
-  let auth = ''
+  let auth = '';
   if (token) {
-    auth = token
+    auth = token;
   }
   const res = await fetch(`${url}/threads/all`, {
     method: 'GET',
     headers: { Authorization: auth },
     agent
-  })
-  const body = res.json()
-  return body
+  });
+  const body = res.json();
+  return body;
 }
 
 async function deleteThread (threadId, token) {
@@ -36,9 +36,9 @@ async function deleteThread (threadId, token) {
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ _id: threadId }),
     agent
-  })
-  const body = res.json()
-  return body
+  });
+  const body = res.json();
+  return body;
 }
 
 async function updateThread (threadId, thread, token) {
@@ -54,9 +54,9 @@ async function updateThread (threadId, thread, token) {
       }
     }),
     agent
-  })
-  const body = await res.json()
-  return body
+  });
+  const body = await res.json();
+  return body;
 }
 
 async function upvoteThread (threadId, token) {
@@ -65,9 +65,9 @@ async function upvoteThread (threadId, token) {
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ threadId: threadId }),
     agent
-  })
-  const body = await res.json()
-  return body
+  });
+  const body = await res.json();
+  return body;
 }
 
 async function downvoteThread (threadId, token) {
@@ -76,9 +76,9 @@ async function downvoteThread (threadId, token) {
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ threadId: threadId }),
     agent
-  })
-  const body = await res.json()
-  return body
+  });
+  const body = await res.json();
+  return body;
 }
 
 async function removeUpvoteThread (threadId, token) {
@@ -87,9 +87,9 @@ async function removeUpvoteThread (threadId, token) {
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ threadId: threadId }),
     agent
-  })
-  const body = await res.json()
-  return body
+  });
+  const body = await res.json();
+  return body;
 }
 
 async function removeDownvoteThread (threadId, token) {
@@ -98,9 +98,9 @@ async function removeDownvoteThread (threadId, token) {
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ threadId: threadId }),
     agent
-  })
-  const body = await res.json()
-  return body
+  });
+  const body = await res.json();
+  return body;
 }
 
 async function starThread (threadId, token) {
@@ -109,9 +109,9 @@ async function starThread (threadId, token) {
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ threadId: threadId }),
     agent
-  })
-  const body = await res.json()
-  return body
+  });
+  const body = await res.json();
+  return body;
 }
 
 async function unstarThread (threadId, token) {
@@ -120,9 +120,9 @@ async function unstarThread (threadId, token) {
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ threadId: threadId }),
     agent
-  })
-  const body = await res.json()
-  return body
+  });
+  const body = await res.json();
+  return body;
 }
 
 module.exports = {
@@ -136,4 +136,4 @@ module.exports = {
   removeDownvoteThread,
   starThread,
   unstarThread
-}
+};

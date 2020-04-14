@@ -1,6 +1,6 @@
-const fetch = require('node-fetch')
-const agent = require('./agent')
-const url = require('./url')
+const fetch = require('node-fetch');
+const agent = require('./agent');
+const url = require('./url');
 
 async function newDraft (content, title, tags, token) {
   const res = await fetch(url + '/drafts/new', {
@@ -8,10 +8,10 @@ async function newDraft (content, title, tags, token) {
     body: JSON.stringify({ draft: { content: content, tags: tags, title: title } }),
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     agent
-  })
+  });
 
-  const body = await res.json()
-  return body
+  const body = await res.json();
+  return body;
 }
 
 async function getAllDraft (token) {
@@ -19,10 +19,10 @@ async function getAllDraft (token) {
     method: 'GET',
     headers: { Authorization: token },
     agent
-  })
+  });
 
-  const body = await res.json()
-  return body
+  const body = await res.json();
+  return body;
 }
 
 async function getOneDraft (draftId, token) {
@@ -30,9 +30,9 @@ async function getOneDraft (draftId, token) {
     method: 'GET',
     headers: { Authorization: token },
     agent
-  })
-  const body = await res.json()
-  return body
+  });
+  const body = await res.json();
+  return body;
 }
 
 async function publishDraft (draftId, token) {
@@ -40,9 +40,9 @@ async function publishDraft (draftId, token) {
     method: 'POST',
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     agent
-  })
-  const body = await res.json()
-  return body
+  });
+  const body = await res.json();
+  return body;
 }
 
 async function deleteDraft (draftId, token) {
@@ -50,10 +50,10 @@ async function deleteDraft (draftId, token) {
     method: 'POST',
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     agent
-  })
+  });
 
-  const body = await res.json()
-  return body
+  const body = await res.json();
+  return body;
 }
 
 async function updateDraft (draftId, draft, token) {
@@ -62,15 +62,15 @@ async function updateDraft (draftId, draft, token) {
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ draft: { _id: draftId, content: draft.content, title: draft.title, tags: draft.tags } }),
     agent
-  })
+  });
 
-  const body = await res.json()
-  return body
+  const body = await res.json();
+  return body;
 }
 
-exports.newDraft = newDraft
-exports.getAllDraft = getAllDraft
-exports.getOneDraft = getOneDraft
-exports.publishDraft = publishDraft
-exports.deleteDraft = deleteDraft
-exports.updateDraft = updateDraft
+exports.newDraft = newDraft;
+exports.getAllDraft = getAllDraft;
+exports.getOneDraft = getOneDraft;
+exports.publishDraft = publishDraft;
+exports.deleteDraft = deleteDraft;
+exports.updateDraft = updateDraft;
