@@ -15,7 +15,7 @@ const dbConn = async () => {
     const dbPromise = MongoClient.connect(dbConnectionString, { useUnifiedTopology: true });
     app.locals.dbClient = await dbPromise;
     app.locals.db = await app.locals.dbClient.db('forum');
-    app.locals.threadCollection = await app.locals.db.collection('threads');
+    app.locals.blogCollection = await app.locals.db.collection('blogs');
     app.locals.replyCollection = await app.locals.db.collection('replies');
     app.locals.userCollection = await app.locals.db.collection('users');
     app.locals.tagCollection = await app.locals.db.collection('tags');
@@ -34,7 +34,7 @@ app.use(cors());
 
 // Logging
 app.use('/drafts', require('./routes/draft'));
-app.use('/blogs', require('./routes/thread'));
+app.use('/blogs', require('./routes/blogs'));
 app.use('/reports', require('./routes/report'));
 app.use('/replies', require('./routes/reply'));
 

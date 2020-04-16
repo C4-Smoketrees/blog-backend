@@ -1,15 +1,15 @@
 const router = require('express').Router();
+const bson = require('bson');
+
 const jwtAuth = require('../middleware/jwtAuth');
 const jwtUnAuth = require('../middleware/jwtUnAuth');
-const bson = require('bson');
 const User = require('../modules/users/model');
-
-const Thread = require('../modules/blogs/model');
+const Blogs = require('../modules/blogs/model');
 
 router.get('/one', jwtUnAuth, async (req, res) => {
   const userId = req.userId;
-  const threadId = req.query.threadId;
-  const response = await Thread.readThreadUsingId(threadId, req.app.locals.threadCollection, userId);
+  const blogId = req.query.blogId;
+  const response = await Blogs.readBlogUsingId(blogId, req.app.locals.blogCollection, userId);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -21,7 +21,7 @@ router.get('/one', jwtUnAuth, async (req, res) => {
 
 router.get('/all', jwtUnAuth, async (req, res) => {
   const userId = req.userId;
-  const response = await Thread.readAllThreads(req.app.locals.threadCollection, userId);
+  const response = await Blogs.readAllBlogs(req.app.locals.blogCollection, userId);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -33,9 +33,9 @@ router.get('/all', jwtUnAuth, async (req, res) => {
 
 router.post('/delete', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const threadId = req.body._id;
+  const blogId = req.body._id;
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) });
-  const response = await user.deleteThread(threadId, req.app.locals.userCollection, req.app.locals.threadCollection);
+  const response = await user.deleteBlog(blogId, req.app.locals.userCollection, req.app.locals.blogCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -47,10 +47,10 @@ router.post('/delete', jwtAuth, async (req, res) => {
 
 router.post('/update', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const thread = req.body.thread;
+  const blog = req.body.blog;
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) });
-  thread._id = bson.ObjectID.createFromHexString(thread._id);
-  const response = await Thread.updateThreadContent(thread, user._id.toHexString(), req.app.locals.threadCollection);
+  blog._id = bson.ObjectID.createFromHexString(blog._id);
+  const response = await Blogs.updateBlogContent(blog, user._id.toHexString(), req.app.locals.blogCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -62,9 +62,9 @@ router.post('/update', jwtAuth, async (req, res) => {
 
 router.post('/star', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const threadId = req.body.threadId;
+  const blogId = req.body.blogId;
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) });
-  const response = await user.addStar(threadId, req.app.locals.userCollection, req.app.locals.threadCollection);
+  const response = await user.addStar(blogId, req.app.locals.userCollection, req.app.locals.blogCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -76,9 +76,9 @@ router.post('/star', jwtAuth, async (req, res) => {
 
 router.post('/unstar', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const threadId = req.body.threadId;
+  const blogId = req.body.blogId;
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) });
-  const response = await user.removeStar(threadId, req.app.locals.userCollection, req.app.locals.threadCollection);
+  const response = await user.removeStar(blogId, req.app.locals.userCollection, req.app.locals.blogCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -90,9 +90,9 @@ router.post('/unstar', jwtAuth, async (req, res) => {
 
 router.post('/upvote', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const threadId = req.body.threadId;
-  await Thread.removeDownvote(threadId, userId, req.app.locals.threadCollection);
-  const response = await Thread.addUpvote(threadId, userId, req.app.locals.threadCollection);
+  const blogId = req.body.blogId;
+  await Blogs.removeDownvote(blogId, userId, req.app.locals.blogCollection);
+  const response = await Blogs.addUpvote(blogId, userId, req.app.locals.blogCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -104,9 +104,9 @@ router.post('/upvote', jwtAuth, async (req, res) => {
 
 router.post('/downvote', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const threadId = req.body.threadId;
-  await Thread.removeUpvote(threadId, userId, req.app.locals.threadCollection);
-  const response = await Thread.addDownvote(threadId, userId, req.app.locals.threadCollection);
+  const blogId = req.body.blogId;
+  await Blogs.removeUpvote(blogId, userId, req.app.locals.blogCollection);
+  const response = await Blogs.addDownvote(blogId, userId, req.app.locals.blogCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -118,8 +118,8 @@ router.post('/downvote', jwtAuth, async (req, res) => {
 
 router.post('/removeUpvote', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const threadId = req.body.threadId;
-  const response = await Thread.removeUpvote(threadId, userId, req.app.locals.threadCollection);
+  const blogId = req.body.blogId;
+  const response = await Blogs.removeUpvote(blogId, userId, req.app.locals.blogCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -131,8 +131,8 @@ router.post('/removeUpvote', jwtAuth, async (req, res) => {
 
 router.post('/removeDownvote', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const threadId = req.body.threadId;
-  const response = await Thread.removeDownvote(threadId, userId, req.app.locals.threadCollection);
+  const blogId = req.body.blogId;
+  const response = await Blogs.removeDownvote(blogId, userId, req.app.locals.blogCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {

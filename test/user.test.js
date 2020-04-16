@@ -3,7 +3,7 @@ const { describe, it, before, after } = require('mocha');
 const app = require('../app');
 const User = require('../modules/users/model');
 const Reply = require('../modules/replies/model');
-const Thread = require('../modules/blogs/model');
+const Blog = require('../modules/blogs/model');
 const bson = require('bson');
 
 after(async function () {
@@ -88,7 +88,7 @@ describe('# User test-suite', function () {
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
       assert.isTrue(res1.status);
       const user = new User({ _id: author1 });
-      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
 
       assert.isTrue(res2.status);
       const res3 = await User.getUser(author1.toHexString(), app.locals.userCollection);
@@ -100,53 +100,53 @@ describe('# User test-suite', function () {
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
       assert.isTrue(res1.status);
       const user = new User({ _id: author1 });
-      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
 
       assert.isTrue(res2.status);
     });
-    it('Delete a thread', async function () {
+    it('Delete a blog', async function () {
       const draft = { content: 'draft content', title: 'draft title' };
       const author1 = new bson.ObjectID(bson.ObjectID.generate());
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
       assert.isTrue(res1.status);
       const user = new User({ _id: author1 });
-      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
 
       assert.isTrue(res2.status);
-      const res3 = await user.deleteThread(res2.threadId, app.locals.userCollection, app.locals.threadCollection);
+      const res3 = await user.deleteBlog(res2.blogId, app.locals.userCollection, app.locals.blogCollection);
       assert.isTrue(res3.status);
     });
-    it('star a thread', async function () {
+    it('star a blog', async function () {
       const draft = { content: 'draft content', title: 'draft title' };
       const author1 = new bson.ObjectID(bson.ObjectID.generate());
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
       assert.isTrue(res1.status);
       const user = new User({ _id: author1 });
-      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
 
       assert.isTrue(res2.status);
-      const res3 = await user.addStar(res2.threadId, app.locals.userCollection, app.locals.threadCollection);
+      const res3 = await user.addStar(res2.blogId, app.locals.userCollection, app.locals.blogCollection);
       assert.isTrue(res3.status);
-      const res4 = await Thread.readThreadUsingId(res2.threadId, app.locals.threadCollection);
-      assert.equal(res4.thread.stars, 1);
-      const res5 = await user.addStar(res2.threadId, app.locals.userCollection, app.locals.threadCollection);
+      const res4 = await Blog.readBlogUsingId(res2.blogId, app.locals.blogCollection);
+      assert.equal(res4.blog.stars, 1);
+      const res5 = await user.addStar(res2.blogId, app.locals.userCollection, app.locals.blogCollection);
       assert.isFalse(res5.status);
     });
-    it('un-star a thread', async function () {
+    it('un-star a blog', async function () {
       const draft = { content: 'draft content', title: 'draft title' };
       const author1 = new bson.ObjectID(bson.ObjectID.generate());
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
       assert.isTrue(res1.status);
       const user = new User({ _id: author1 });
-      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
 
       assert.isTrue(res2.status);
-      const res3 = await user.addStar(res2.threadId, app.locals.userCollection, app.locals.threadCollection);
+      const res3 = await user.addStar(res2.blogId, app.locals.userCollection, app.locals.blogCollection);
       assert.isTrue(res3.status);
-      const res4 = await user.removeStar(res2.threadId, app.locals.userCollection, app.locals.threadCollection);
+      const res4 = await user.removeStar(res2.blogId, app.locals.userCollection, app.locals.blogCollection);
       assert.isTrue(res4.status);
-      const res5 = await Thread.readThreadUsingId(res2.threadId, app.locals.threadCollection);
-      assert.equal(res5.thread.stars, 0);
+      const res5 = await Blog.readBlogUsingId(res2.blogId, app.locals.blogCollection);
+      assert.equal(res5.blog.stars, 0);
     });
     it('create a reply', async function () {
       const draft = { content: 'reply content', title: 'reply title' };
@@ -154,12 +154,12 @@ describe('# User test-suite', function () {
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
       assert.isTrue(res1.status);
       const user = new User({ _id: author1 });
-      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
 
       assert.isTrue(res2.status);
       const reply = new Reply({ content: 'reply content', author: author1 });
-      const res3 = await user.addReply(reply, { threadId: res2.threadId },
-        app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection);
+      const res3 = await user.addReply(reply, { blogId: res2.blogId },
+        app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
       assert.isTrue(res3.status);
       const res4 = await Reply.readReply(reply._id.toHexString(), app.locals.replyCollection);
       assert.equal(res4.reply.content, 'reply content');
@@ -170,18 +170,18 @@ describe('# User test-suite', function () {
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
       assert.isTrue(res1.status);
       const user = new User({ _id: author1 });
-      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
 
       assert.isTrue(res2.status);
       const reply = new Reply({ content: 'reply content', author: author1 });
-      const res3 = await user.addReply(reply, { threadId: res2.threadId },
-        app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection);
+      const res3 = await user.addReply(reply, { blogId: res2.blogId },
+        app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
       assert.isTrue(res3.status);
-      const res4 = await user.deleteReply(reply._id.toHexString(), { threadId: res2.threadId },
-        app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection);
+      const res4 = await user.deleteReply(reply._id.toHexString(), { blogId: res2.blogId },
+        app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
       assert.isTrue(res4.status);
-      const res5 = await Thread.readThreadUsingId(res2.threadId, app.locals.threadCollection);
-      assert.equal(res5.thread.replies.length, 0);
+      const res5 = await Blog.readBlogUsingId(res2.blogId, app.locals.blogCollection);
+      assert.equal(res5.blog.replies.length, 0);
     });
     it('Read all tags', async function () {
       const draft = { content: 'draft content', title: 'draft title', tags: ['#google', '#noob'] };
@@ -189,9 +189,9 @@ describe('# User test-suite', function () {
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
       assert.isTrue(res1.status);
       const user = new User({ _id: author1 });
-      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
       assert.isTrue(res2.status);
-      const res3 = await Thread.readTags(app.locals.tagCollection);
+      const res3 = await Blog.readTags(app.locals.tagCollection);
 
       assert.isTrue(res3.status);
     });

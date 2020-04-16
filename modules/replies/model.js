@@ -16,7 +16,7 @@ class Reply {
     this.reports = object.reports;
   }
 
-  static async createReply (reply, id, threadCollection, replyCollection) {
+  static async createReply (reply, id, blogCollection, replyCollection) {
     let response;
     reply.upvotes = [];
     reply.downvotes = [];
@@ -37,19 +37,19 @@ class Reply {
         }
       };
       let res;
-      if (id.threadId) {
-        filter = { _id: bson.ObjectID.createFromHexString(id.threadId) };
-        res = await threadCollection.updateOne(filter, query);
+      if (id.blogId) {
+        filter = { _id: bson.ObjectID.createFromHexString(id.blogId) };
+        res = await blogCollection.updateOne(filter, query);
       } else if (id.replyId) {
         filter = { _id: bson.ObjectID.createFromHexString(id.replyId) };
         res = await replyCollection.updateOne(filter, query);
       } else {
-        return { status: false, msg: 'threadId or replyId missing' };
+        return { status: false, msg: 'blogId or replyId missing' };
       }
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to create a reply for thread:${id.threadId} reply:${id.reply.threadId} replyId:${reply._id}`
+          msg: `Unable to create a reply for blog:${id.blogId} reply:${id.reply.blogId} replyId:${reply._id}`
         };
         logger.debug(response.msg);
       } else {
@@ -59,14 +59,14 @@ class Reply {
           msg: 'success',
           replyId: reply._id.toHexString()
         };
-        logger.debug(`New reply for thread:${id.threadId}  reply:${id.replyId} replyId:${reply._id}`);
+        logger.debug(`New reply for blog:${id.blogId}  reply:${id.replyId} replyId:${reply._id}`);
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       };
-      logger.error(`error reply for thread:${id.threadId}  reply:${id.replyId} replyId:${reply._id}`, e);
+      logger.error(`error reply for blog:${id.blogId}  reply:${id.replyId} replyId:${reply._id}`, e);
     }
     return response;
   }
@@ -104,7 +104,7 @@ class Reply {
     return response;
   }
 
-  static async deleteReply (replyId, id, threadCollection, replyCollection) {
+  static async deleteReply (replyId, id, blogCollection, replyCollection) {
     let response;
     try {
       let filter;
@@ -113,19 +113,19 @@ class Reply {
       const query = {
         $pull: { replies: bson.ObjectID.createFromHexString(replyId) }
       };
-      if (id.threadId) {
-        filter = { _id: bson.ObjectID.createFromHexString(id.threadId) };
-        res = await threadCollection.updateOne(filter, query);
+      if (id.blogId) {
+        filter = { _id: bson.ObjectID.createFromHexString(id.blogId) };
+        res = await blogCollection.updateOne(filter, query);
       } else if (id.replyId) {
         filter = { _id: bson.ObjectID.createFromHexString(id.replyId) };
         res = await replyCollection.updateOne(filter, query);
       } else {
-        return { status: false, msg: 'threadId or replyId missing' };
+        return { status: false, msg: 'blogId or replyId missing' };
       }
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to delete reply thread:${id.threadId} reply:${id.replyId} replyId:${replyId}`
+          msg: `Unable to delete reply blog:${id.blogId} reply:${id.replyId} replyId:${replyId}`
         };
         logger.debug(response.msg);
       } else {
@@ -135,14 +135,14 @@ class Reply {
           msg: 'success',
           replyId: replyId
         };
-        logger.debug(`deleted reply for thread:${id.threadId} reply:${id.replyId} replyId:${replyId}`);
+        logger.debug(`deleted reply for blog:${id.blogId} reply:${id.replyId} replyId:${replyId}`);
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       };
-      logger.error(`Unable to delete reply for thread:${id.threadId} reply:${id.replyId}`, e);
+      logger.error(`Unable to delete reply for blog:${id.blogId} reply:${id.replyId}`, e);
     }
     return response;
   }

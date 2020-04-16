@@ -22,33 +22,33 @@ class Report {
 
   /**
    * Create Report for a post
-   * @param {string} threadId
+   * @param {string} blogId
    * @param {Report} report
-   * @param {Collection} threadCollection
+   * @param {Collection} blogCollection
    * @return {Promise<DatabaseReportWriteResponse>}
    */
-  static async createReport (threadId, report, threadCollection) {
+  static async createReport (blogId, report, blogCollection) {
     const func = async () => {
       try {
         let response;
-        const threadObjectId = bson.ObjectId.createFromHexString(threadId);
-        let filter = { _id: threadObjectId, 'reports.userId': report.userId };
-        const thread = await threadCollection.findOne(filter);
-        if (thread == null) {
-          filter = { _id: threadObjectId };
+        const blogObjectId = bson.ObjectId.createFromHexString(blogId);
+        let filter = { _id: blogObjectId, 'reports.userId': report.userId };
+        const blog = await blogCollection.findOne(filter);
+        if (blog == null) {
+          filter = { _id: blogObjectId };
           report._id = new bson.ObjectID(bson.ObjectID.generate());
           const query = { $push: { reports: report } };
-          const res = await threadCollection.updateOne(filter, query);
+          const res = await blogCollection.updateOne(filter, query);
           if (res.modifiedCount === 1) {
             response = { status: true, reportId: report._id.toHexString(), msg: 'success' };
             logger.debug(`Reported report_id:${report._id.toHexString()}`);
           } else {
-            logger.warn(`Unable to report threadId:${threadId} userId:${report.userId.toHexString()}`);
+            logger.warn(`Unable to report blogId:${blogId} userId:${report.userId.toHexString()}`);
             response = { status: false, err: `matched:${res.matchedCount} modified:${res.modifiedCount}` };
           }
         } else {
           response = { status: false, err: 'already reported' };
-          logger.debug(`Already reported thread_id:${threadId} user_id:${report.userId.toHexString()}`);
+          logger.debug(`Already reported blog_id:${blogId} user_id:${report.userId.toHexString()}`);
         }
         return response;
       } catch (e) {

@@ -3,75 +3,75 @@ const logger = require('../../logging/logger');
 
 /**
  * @typedef {{status:boolean,id:string|undefined}} DatabaseWriteResponse
- * @typedef {{status:boolean,thread:Thread|undefined}} DatabaseReadResponse
+ * @typedef {{status:boolean,blog:Blog|undefined}} DatabaseReadResponse
  */
 
 /**
- * Class representing a thread
+ * Class representing a blog
  */
-class Thread {
+class Blog {
   /**
-   * Create an instance of thread
-   * @param {{author: ObjectId, content: string,title:string}} thread Object representing the Thread
-   * @param {Thread} thread Object representing a thread
-   * @param {string} thread.title Threads title
-   * @param {bson.ObjectID=auto_generate} [thread._id] Id for the object
-   * @param {string} thread.content Content for the Thread
-   * @param {array(Replies)=[]} [thread.replies] Replies array contains Replies
-   * @param {array(Reports)=[]} [thread.reports] Reports array contains Reports
-   * @param {number=time.now()} [thread.dateTime] Datetime
-   * @param {array(bson.ObjectID)=[]} [thread.upvotes] Upvotes array
-   * @param {array(bson.ObjectID)=[]} [thread.downvotes] Downvotes array
-   * @param {bson.ObjectID} thread.author Author of the thread
-   * @param {number=0} [thread.stars] Stars for the post
-   * @param {number=time.now()} thread.astUpdate Last updated
+   * Create an instance of blog
+   * @param {{author: ObjectId, content: string,title:string}} blog Object representing the Blog
+   * @param {Blog} blog Object representing a blog
+   * @param {string} blog.title Blog's title
+   * @param {bson.ObjectID=auto_generate} [blog._id] Id for the object
+   * @param {string} blog.content Content for the Blog
+   * @param {array(Replies)=[]} [blog.replies] Replies array contains Replies
+   * @param {array(Reports)=[]} [blog.reports] Reports array contains Reports
+   * @param {number=time.now()} [blog.dateTime] Datetime
+   * @param {array(bson.ObjectID)=[]} [blog.upvotes] Upvotes array
+   * @param {array(bson.ObjectID)=[]} [blog.downvotes] Downvotes array
+   * @param {bson.ObjectID} blog.author Author of the blog
+   * @param {number=0} [blog.stars] Stars for the post
+   * @param {number=time.now()} blog.astUpdate Last updated
    */
-  constructor (thread) {
-    this._id = thread._id;
-    this.content = thread.content;
-    this.title = thread.title;
-    this.replies = thread.replies;
-    this.reports = thread.reports;
-    this.dateTime = thread.dateTime;
-    this.upvotesCount = thread.upvotesCount;
-    this.downvotesCount = thread.downvotesCount;
-    this.upvotes = thread.upvotes;
-    this.downvotes = thread.downvotes;
-    this.author = thread.author;
-    this.stars = thread.stars;
-    this.lastUpdate = thread.lastUpdate;
-    this.tags = thread.tags;
+  constructor (blog) {
+    this._id = blog._id;
+    this.content = blog.content;
+    this.title = blog.title;
+    this.replies = blog.replies;
+    this.reports = blog.reports;
+    this.dateTime = blog.dateTime;
+    this.upvotesCount = blog.upvotesCount;
+    this.downvotesCount = blog.downvotesCount;
+    this.upvotes = blog.upvotes;
+    this.downvotes = blog.downvotes;
+    this.author = blog.author;
+    this.stars = blog.stars;
+    this.lastUpdate = blog.lastUpdate;
+    this.tags = blog.tags;
   }
 
   /**
-   * Creates a new thread in database
-   * @param {Collection} threadCollection
-   * @param {Thread} thread
+   * Creates a new blog in database
+   * @param {Collection} blogCollection
+   * @param {Blog} blog
    * @returns {Promise} returns a promise
    */
-  static createThread (thread, threadCollection) {
+  static createBlog (blog, blogCollection) {
     const func = async () => {
       try {
-        thread._id = new bson.ObjectID(bson.ObjectID.generate());
-        thread.replies = [];
-        thread.reports = [];
-        thread.dateTime = Date.now();
-        thread.upvotes = [];
-        thread.downvotes = [];
-        thread.upvotesCount = 0;
-        thread.downvotesCount = 0;
-        thread.stars = 0;
-        thread.lastUpdate = Date.now();
-        await threadCollection.insertOne(thread);
+        blog._id = new bson.ObjectID(bson.ObjectID.generate());
+        blog.replies = [];
+        blog.reports = [];
+        blog.dateTime = Date.now();
+        blog.upvotes = [];
+        blog.downvotes = [];
+        blog.upvotesCount = 0;
+        blog.downvotesCount = 0;
+        blog.stars = 0;
+        blog.lastUpdate = Date.now();
+        await blogCollection.insertOne(blog);
         const response = {
           status: true,
-          threadId: thread._id.toHexString()
+          blogId: blog._id.toHexString()
         };
-        logger.debug(`Insert new thread with id:${response.threadId}`);
+        logger.debug(`Insert new blog with id:${response.blogId}`);
         return response;
       } catch (e) {
         const response = { status: false, err: e };
-        logger.error(` err new thread with id:${response.id}`, { err: e });
+        logger.error(`Error creating new blog with id:${response.id}`, { err: e });
         return response;
       }
     };
@@ -79,41 +79,41 @@ class Thread {
   }
 
   /**
-   * Update ThreadContent using _id property of the thread object
-   * @param thread
+   * Update BlogContent using _id property of the blog object
+   * @param blog
    * @param userId
-   * @param {Collection} threadCollection
+   * @param {Collection} blogCollection
    * @returns {Promise} A promise that always resolves
    */
-  static updateThreadContent (thread, userId, threadCollection) {
-    const filter = { _id: thread._id, author: bson.ObjectID.createFromHexString(userId) };
-    thread.lastUpdate = Date.now();
+  static updateBlogContent (blog, userId, blogCollection) {
+    const filter = { _id: blog._id, author: bson.ObjectID.createFromHexString(userId) };
+    blog.lastUpdate = Date.now();
     const query = {
       $set: {
-        title: thread.title,
-        content: thread.content,
-        tags: thread.tags
+        title: blog.title,
+        content: blog.content,
+        tags: blog.tags
       }
     };
 
     const func = async () => {
       try {
-        const res = await threadCollection.updateOne(filter, query, {});
+        const res = await blogCollection.updateOne(filter, query, {});
         let response;
         if (res.modifiedCount === 1) {
           response = {
             status: true,
-            threadId: thread._id.toHexString()
+            blogId: blog._id.toHexString()
           };
-          logger.debug(`Updated content for thread for id: ${response.threadId}`);
+          logger.debug(`Updated content for blog with id: ${response.blogId}`);
         } else {
-          response = { status: false, id: thread._id.toHexString() };
-          logger.error(JSON.stringify({ id: thread._id.toHexString(), matches: res.matchedCount }));
+          response = { status: false, id: blog._id.toHexString() };
+          logger.error(JSON.stringify({ id: blog._id.toHexString(), matches: res.matchedCount }));
         }
         return response;
       } catch (e) {
         const response = { status: false };
-        logger.error(`Error in updating thread for id: ${thread._id}`);
+        logger.error(`Error in updating blog with id: ${blog._id}`);
         return response;
       }
     };
@@ -121,13 +121,13 @@ class Thread {
   }
 
   /**
-   * Read and return a thread using id
-   * @param {string} id HexString representing id of the thread
-   * @param {Collection} threadCollection
+   * Read and return a blog using id
+   * @param {string} id HexString representing id of the blog
+   * @param {Collection} blogCollection
    * @param {string} [userId]
    * @returns {Promise}  Promise always resolves
    */
-  static readThreadUsingId (id, threadCollection, userId) {
+  static readBlogUsingId (id, blogCollection, userId) {
     const objectId = bson.ObjectID.createFromHexString(id);
     const filter = { _id: objectId };
     let projection;
@@ -164,9 +164,9 @@ class Thread {
     }
     const func = async () => {
       try {
-        const dbRes = await threadCollection.findOne(filter, { projection: projection });
-        const res = { status: true, thread: await dbRes };
-        logger.debug(`Read thread with id: ${res.thread._id.toHexString()}`);
+        const dbRes = await blogCollection.findOne(filter, { projection: projection });
+        const res = { status: true, blog: await dbRes };
+        logger.debug(`Read blog with id: ${res.blog._id.toHexString()}`);
         return res;
       } catch (e) {
         const res = { status: false };
@@ -177,7 +177,7 @@ class Thread {
     return func();
   }
 
-  static async readAllThreads (threadCollection, userId) {
+  static async readAllBlogs (blogCollection, userId) {
     let projection;
     if (userId) {
       projection = {
@@ -212,15 +212,15 @@ class Thread {
     }
     try {
       let doc;
-      const threads = [];
+      const blogs = [];
       let length = 0;
-      const res = await threadCollection.find({}, { projection: projection });
+      const res = await blogCollection.find({}, { projection: projection });
       while (await res.hasNext()) {
         doc = await res.next();
-        threads.push(doc);
+        blogs.push(doc);
         length += 1;
       }
-      return { status: true, threads: threads, length: length };
+      return { status: true, blogs: blogs, length: length };
     } catch (e) {
       const res = { status: false };
       logger.error(JSON.stringify({ msg: 'Error in reading all blogs', err: e }));
@@ -229,21 +229,21 @@ class Thread {
   }
 
   /**
-   * Delete a thread from the id
-   * @param {string} id  HexString representing id of the thread
-   * @param {Collection} threadCollection
+   * Delete a blog with the id
+   * @param {string} id  HexString representing id of the blog
+   * @param {Collection} blogCollection
    * @returns {Promise} Always resolves
    */
-  static deleteThreadUsingId (id, threadCollection) {
+  static deleteBlogUsingId (id, blogCollection) {
     const objectId = bson.ObjectID.createFromHexString(id);
     const filter = { _id: objectId };
     const func = async () => {
       try {
-        const res = await threadCollection.deleteOne(filter);
+        const res = await blogCollection.deleteOne(filter);
         let response;
         if (res.deletedCount === 1) {
-          response = { status: true, threadId: id };
-          logger.debug(`Deleted thread id: ${id}`);
+          response = { status: true, blogId: id };
+          logger.debug(`Deleted blog id: ${id}`);
         } else {
           response = { status: false };
         }
@@ -272,13 +272,13 @@ class Thread {
   }
 
   /**
-   * Increment or Decrement stars of the thread
+   * Increment or Decrement stars of the blog
    * @param {string} id HexString representing the id
    * @param {string} command Either inc or dec
-   * @param {Collection} threadCollection
+   * @param {Collection} blogCollection
    * @returns {Promise<DatabaseWriteResponse>} Promise always resolves
    */
-  static updateStars (id, command, threadCollection) {
+  static updateStars (id, command, blogCollection) {
     const objectId = new bson.ObjectID(bson.ObjectID.createFromHexString(id));
 
     const filter = { _id: objectId };
@@ -293,13 +293,13 @@ class Thread {
 
     const func = async () => {
       try {
-        const result = await threadCollection.updateOne(filter, query);
+        const result = await blogCollection.updateOne(filter, query);
         let response;
         if (result.modifiedCount === 1) {
-          response = { status: true, threadId: id };
+          response = { status: true, blogId: id };
           logger.debug(`Incremented star for the id: ${id}`);
         } else {
-          response = { status: false, threadId: id };
+          response = { status: false, blogId: id };
           logger.warn(`Error in incrementing star for id: ${id} modified:${result.modifiedCount} match: ${result.matchedCount}`);
         }
         return response;
@@ -313,17 +313,17 @@ class Thread {
     return func();
   }
 
-  static async readThreadByTag (tag, threadCollection) {
+  static async readBlogByTag (tag, blogCollection) {
     try {
       const filter = { tags: tag };
-      const res = await threadCollection.find(filter);
-      const threads = [];
+      const res = await blogCollection.find(filter);
+      const blogs = [];
       let doc;
       while (await res.hasNext()) {
         doc = await res.next();
-        threads.push(doc);
+        blogs.push(doc);
       }
-      return { status: true, threads: threads };
+      return { status: true, blogs: blogs };
     } catch (e) {
       const res = { status: false, err: e };
       logger.error(JSON.stringify({ msg: 'Error in reading all blogs', err: e }));
@@ -331,16 +331,16 @@ class Thread {
     }
   }
 
-  static async addUpvote (threadId, userId, threadCollection) {
-    const filter = { _id: bson.ObjectID.createFromHexString(threadId) };
+  static async addUpvote (blogId, userId, blogCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(blogId) };
     let query = { $addToSet: { upvotes: bson.ObjectID.createFromHexString(userId) } };
 
     let response;
     try {
-      const res = await threadCollection.updateOne(filter, query);
+      const res = await blogCollection.updateOne(filter, query);
       if (res.modifiedCount === 1) {
         query = { $inc: { upvotesCount: 1 } };
-        await threadCollection.updateOne(filter, query);
+        await blogCollection.updateOne(filter, query);
         response = {
           status: true
         };
@@ -354,21 +354,21 @@ class Thread {
         status: false,
         err: e
       };
-      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`);
+      logger.error(`Error in upvoting blog: ${blogId} error:${e.message}`);
     }
     return response;
   }
 
-  static async addDownvote (threadId, userId, threadCollection) {
-    const filter = { _id: bson.ObjectID.createFromHexString(threadId) };
+  static async addDownvote (blogId, userId, blogCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(blogId) };
     let query = { $addToSet: { downvotes: bson.ObjectID.createFromHexString(userId) } };
 
     let response;
     try {
-      const res = await threadCollection.updateOne(filter, query);
+      const res = await blogCollection.updateOne(filter, query);
       if (res.modifiedCount === 1) {
         query = { $inc: { downvotesCount: 1 } };
-        await threadCollection.updateOne(filter, query);
+        await blogCollection.updateOne(filter, query);
         response = {
           status: true
         };
@@ -382,21 +382,21 @@ class Thread {
         status: false,
         err: e
       };
-      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`);
+      logger.error(`Error in upvoting blog: ${blogId} error:${e.message}`);
     }
     return response;
   }
 
-  static async removeDownvote (threadId, userId, threadCollection) {
-    const filter = { _id: bson.ObjectID.createFromHexString(threadId) };
+  static async removeDownvote (blogId, userId, blogCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(blogId) };
     let query = { $pull: { downvotes: bson.ObjectID.createFromHexString(userId) } };
 
     let response;
     try {
-      const res = await threadCollection.updateOne(filter, query);
+      const res = await blogCollection.updateOne(filter, query);
       if (res.modifiedCount === 1) {
         query = { $inc: { downvotesCount: -1 } };
-        await threadCollection.updateOne(filter, query);
+        await blogCollection.updateOne(filter, query);
         response = {
           status: true
         };
@@ -410,21 +410,21 @@ class Thread {
         status: false,
         err: e
       };
-      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`);
+      logger.error(`Error in removing downvote: ${blogId} error:${e.message}`);
     }
     return response;
   }
 
-  static async removeUpvote (threadId, userId, threadCollection) {
-    const filter = { _id: bson.ObjectID.createFromHexString(threadId) };
+  static async removeUpvote (blogId, userId, blogCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(blogId) };
     let query = { $pull: { upvotes: bson.ObjectID.createFromHexString(userId) } };
 
     let response;
     try {
-      const res = await threadCollection.updateOne(filter, query);
+      const res = await blogCollection.updateOne(filter, query);
       if (res.modifiedCount === 1) {
         query = { $inc: { upvotesCount: -1 } };
-        await threadCollection.updateOne(filter, query);
+        await blogCollection.updateOne(filter, query);
         response = {
           status: true
         };
@@ -438,10 +438,10 @@ class Thread {
         status: false,
         err: e
       };
-      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`);
+      logger.error(`Error in removing upvote: ${blogId} error:${e.message}`);
     }
     return response;
   }
 }
 
-module.exports = Thread;
+module.exports = Blog;

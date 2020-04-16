@@ -1,6 +1,6 @@
 const ObjectId = require('bson').ObjectID;
 const logger = require('../../logging/logger');
-const Thread = require('../blogs/model');
+const Blog = require('../blogs/model');
 const Reply = require('../replies/model');
 
 /**
@@ -10,7 +10,7 @@ class User {
   constructor (object) {
     this._id = object._id;
     this.stars = object.stars;
-    this.threads = object.threads;
+    this.blogs = object.blogs;
     this.replies = object.replies;
     this.drafts = object.drafts;
   }
@@ -132,16 +132,16 @@ class User {
     return response;
   }
 
-  async publishDraft (draftId, userCollection, threadCollection) {
+  async publishDraft (draftId, userCollection, blogCollection) {
     const draft = (await User.readDraft(this._id.toHexString(), draftId, userCollection)).draft;
 
-    const thread = new Thread({
+    const blog = new Blog({
       content: draft.content,
       title: draft.title,
       author: this._id
     });
     let response;
-    const res = await Thread.createThread(thread, threadCollection);
+    const res = await Blog.createBlog(blog, blogCollection);
     if (!res.status) {
       if (res.err) {
         response = { status: false, msg: 'error occurred', err: res.err };
@@ -151,7 +151,7 @@ class User {
     }
     try {
       const filter = { _id: this._id };
-      const query = { $push: { threads: thread._id } };
+      const query = { $push: { blogs: blog._id } };
       const res2 = await userCollection.updateOne(filter, query, { upsert: true });
       if (res2.modifiedCount !== 1) {
         logger.error('Error in publishing draft(adding to the user blogs)', {
@@ -161,7 +161,7 @@ class User {
         });
         response = { status: false, msg: 'Error in adding to user blogs' };
       }
-      response = { status: true, threadId: thread._id.toHexString(), draftId: draft._id.toHexString() };
+      response = { status: true, blogId: blog._id.toHexString(), draftId: draft._id.toHexString() };
     } catch (e) {
       response = { status: false, err: e };
       return response;
@@ -178,34 +178,34 @@ class User {
     return response;
   }
 
-  async deleteThread (threadId, userCollection, threadCollection) {
-    const res = await Thread.deleteThreadUsingId(threadId, threadCollection);
+  async deleteBlog (blogId, userCollection, blogCollection) {
+    const res = await Blog.deleteBlogUsingId(blogId, blogCollection);
     if (!res.status) {
       return { status: false };
     }
     try {
       const filter = { _id: this._id };
-      const update = { $pull: { threads: ObjectId.createFromHexString(threadId) } };
+      const update = { $pull: { blogs: ObjectId.createFromHexString(blogId) } };
       const res2 = await userCollection.updateOne(filter, update);
       if (res2.modifiedCount !== 1) {
         return { status: false };
       }
     } catch (e) {
-      logger.error('Error in deleting thread from the user collection', { err: e });
+      logger.error('Error in deleting blog from the user collection', { err: e });
       return { status: false };
     }
     return { status: true };
   }
 
-  async addStar (threadId, userCollection, threadCollection) {
+  async addStar (blogId, userCollection, blogCollection) {
     try {
       const filter = { _id: this._id };
-      const update = { $addToSet: { stars: ObjectId.createFromHexString(threadId) } };
+      const update = { $addToSet: { stars: ObjectId.createFromHexString(blogId) } };
       const res2 = await userCollection.updateOne(filter, update);
       if (res2.modifiedCount !== 1) {
         return { status: false };
       }
-      const res = await Thread.updateStars(threadId, 'inc', threadCollection);
+      const res = await Blog.updateStars(blogId, 'inc', blogCollection);
       if (!res.status) {
         return { status: false };
       }
@@ -216,15 +216,15 @@ class User {
     return { status: true };
   }
 
-  async removeStar (threadId, userCollection, threadCollection) {
+  async removeStar (blogId, userCollection, blogCollection) {
     try {
       const filter = { _id: this._id };
-      const update = { $pull: { stars: ObjectId.createFromHexString(threadId) } };
+      const update = { $pull: { stars: ObjectId.createFromHexString(blogId) } };
       const res2 = await userCollection.updateOne(filter, update);
       if (res2.modifiedCount !== 1) {
         return { status: false };
       }
-      const res = await Thread.updateStars(threadId, 'dec', threadCollection);
+      const res = await Blog.updateStars(blogId, 'dec', blogCollection);
       if (!res.status) {
         return { status: false };
       }
@@ -256,12 +256,12 @@ class User {
    * @param {Reply} reply
    * @param id
    * @param userCollection
-   * @param threadCollection
+   * @param blogCollection
    * @param replyCollection
    * @returns {Promise<{status: boolean}>}
    */
-  async addReply (reply, id, userCollection, threadCollection, replyCollection) {
-    const res1 = await Reply.createReply(reply, id, threadCollection, replyCollection);
+  async addReply (reply, id, userCollection, blogCollection, replyCollection) {
+    const res1 = await Reply.createReply(reply, id, blogCollection, replyCollection);
     if (!res1.status) {
       return { status: false };
     }
@@ -280,8 +280,8 @@ class User {
     return { status: true, replyId: res1.replyId };
   }
 
-  async deleteReply (replyId, id, userCollection, threadCollection, replyCollection) {
-    const res1 = await Reply.deleteReply(replyId, id, threadCollection, replyCollection);
+  async deleteReply (replyId, id, userCollection, blogCollection, replyCollection) {
+    const res1 = await Reply.deleteReply(replyId, id, blogCollection, replyCollection);
     if (!res1.status) {
       return { status: false };
     }

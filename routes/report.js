@@ -3,9 +3,9 @@ const jwtAuth = require('../middleware/jwtAuth');
 const bson = require('bson');
 const Report = require('../modules/reports/model');
 
-router.post('/thread', jwtAuth, async (req, res) => {
+router.post('/blog', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const threadId = req.query.threadId;
+  const blogId = req.query.blogId;
   const report = req.body.report;
   if (!report) {
     res.status(400).json({ status: false, msg: 'Report field missing' });
@@ -19,11 +19,11 @@ router.post('/thread', jwtAuth, async (req, res) => {
     return;
   }
 
-  const response = await Report.createReport(threadId, {
+  const response = await Report.createReport(blogId, {
     reportReason: report.reportReason,
     description: report.description,
     userId: bson.ObjectId.createFromHexString(userId)
-  }, req.app.locals.threadCollection);
+  }, req.app.locals.blogCollection);
   if (response.status) {
     res.status(200).json(response);
   } else {

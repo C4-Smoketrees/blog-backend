@@ -4,7 +4,7 @@ const jwtUnAuth = require('../middleware/jwtUnAuth');
 const bson = require('bson');
 const User = require('../modules/users/model');
 const Reply = require('../modules/replies/model');
-const Thread = require('../modules/blogs/model');
+const Blog = require('../modules/blogs/model');
 
 router.get('/', jwtUnAuth, async (req, res) => {
   const userId = req.userId;
@@ -27,7 +27,7 @@ router.post('/', jwtAuth, async (req, res) => {
   reply.author = bson.ObjectID.createFromHexString(userId);
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) });
   const response = await user.addReply(reply, id, req.app.locals.userCollection,
-    req.app.locals.threadCollection, req.app.locals.replyCollection);
+    req.app.locals.blogCollection, req.app.locals.replyCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -43,7 +43,7 @@ router.post('/delete', jwtAuth, async (req, res) => {
   const replyId = req.body.replyId;
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) });
   const response = await user.deleteReply(replyId, id, req.app.locals.userCollection,
-    req.app.locals.threadCollection, req.app.locals.replyCollection);
+    req.app.locals.blogCollection, req.app.locals.replyCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -112,7 +112,7 @@ router.post('/removeUpvote', jwtAuth, async (req, res) => {
 router.post('/removeDownvote', jwtAuth, async (req, res) => {
   const userId = req.userId;
   const replyId = req.body.replyId;
-  const response = await Thread.removeDownvote(replyId, userId, req.app.locals.replyCollection);
+  const response = await Blog.removeDownvote(replyId, userId, req.app.locals.replyCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {

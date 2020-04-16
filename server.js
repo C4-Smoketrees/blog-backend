@@ -1,7 +1,7 @@
-const app = require('./app');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const app = require('./app');
 const logger = require('./logging/logger');
 
 const PORT = process.env.PORT || 8443;
