@@ -19,6 +19,7 @@ const dbConn = async () => {
     app.locals.userCollection = await app.locals.db.collection('users');
     app.locals.tagCollection = await app.locals.db.collection('tags');
   } catch (e) {
+    logger.warn(e);
     process.exit(2);
   }
 };
@@ -35,7 +36,7 @@ app.use('/threads', require('./routes/thread'));
 app.use('/reports', require('./routes/report'));
 app.use('/replies', require('./routes/reply'));
 
-app.use('*', function (req, res) {
+app.use('*', function (_req, res) {
   res.status(400).json({ status: false, message: 'Resource Not found' });
 });
 
