@@ -59,17 +59,20 @@ describe('# Threads test-suite', function () {
         assert.isTrue(false);
       }
     });
-    it('Real all blogs', async function () {
+    it('Read all blogs', async function () {
       // For Callback (Passing)
       try {
+        const author = new bson.ObjectID(bson.ObjectID.generate());
         const thread = new Blog({
-          author: new bson.ObjectID(bson.ObjectID.generate()),
+          author: author,
           content: 'read content'
         });
         const res = await Blog.createBlog(thread, app.locals.blogCollection);
         assert.isTrue(res.status);
         const res2 = await Blog.readAllBlogs(app.locals.blogCollection);
         assert.isTrue(res2.status);
+        const res3 = await Blog.readAllBlogs(app.locals.blogCollection, author.toHexString());
+        assert.isTrue(res3.status);
       } catch (e) {
         assert.isTrue(false);
       }
@@ -135,7 +138,7 @@ describe('# Threads test-suite', function () {
         assert.equal(e.message, 'Illegal Command');
       }
     });
-    it('Upvote a content', async function () {
+    it('Upvote content', async function () {
       try {
         const thread = new Blog({
           author: new bson.ObjectID(bson.ObjectID.generate()),
@@ -158,8 +161,7 @@ describe('# Threads test-suite', function () {
         assert.isTrue(false);
       }
     });
-
-    it('Downvote a content', async function () {
+    it('Downvote content', async function () {
       try {
         const thread = new Blog({
           author: new bson.ObjectID(bson.ObjectID.generate()),
@@ -181,6 +183,35 @@ describe('# Threads test-suite', function () {
       } catch (e) {
         assert.isTrue(false);
       }
+    });
+
+    // Error cases
+    it('Catch error in creating a blog', async function () {
+      try {
+        const res = await Blog.createBlog(null, app.locals.blogCollection);
+        assert.isFalse(res.status);
+        assert.isNotNull(res.err);
+      } catch (e) {
+      }
+    });
+    it('Catch error in updating a blog', async function () {
+      const author = new bson.ObjectID(bson.ObjectID.generate());
+      const blog = new Blog({
+        author: author,
+        title: 'test title',
+        content: 'test content'
+      });
+      const res = await Blog.updateBlogContent(blog, author.toHexString(), app.locals.blogCollection);
+      assert.isFalse(res.status);
+    });
+    it('Catch error in reading all blogs', async function () {
+      const res = await Blog.readAllBlogs(null);
+      assert.isFalse(res.status);
+    });
+    it('Catch error in deleting blog by ID', async function () {
+      const res = await Blog.deleteBlogUsingId(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), null);
+      assert.isFalse(res.status);
+      assert.isNotNull(res.err);
     });
   });
 });

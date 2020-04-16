@@ -71,7 +71,7 @@ class Blog {
         return response;
       } catch (e) {
         const response = { status: false, err: e };
-        logger.error(`Error creating new blog with id:${response.id}`, { err: e });
+        logger.error('Error creating new blog', { err: e });
         return response;
       }
     };
