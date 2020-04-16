@@ -6,6 +6,7 @@ const sanitizer = require('express-sanitizer');
 const parser = require('body-parser');
 const morgan = require('./logging/morgan');
 const logger = require('./logging/logger');
+const cors = require('cors');
 
 // Connect to the database
 const dbConnectionString = 'mongodb://localhost:27017' || process.env.DB_CONN_STRING;
@@ -29,6 +30,7 @@ dbConn().then(() => { logger.info('Connection established to mongoDB'); });
 app.use(sanitizer());
 app.use(parser.json());
 app.use(compression());
+app.use(cors());
 
 // Logging
 app.use('/drafts', require('./routes/draft'));
