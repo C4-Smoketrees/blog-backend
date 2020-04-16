@@ -1,7 +1,7 @@
 const { assert } = require('chai');
 const { describe, it } = require('mocha');
 const app = require('../app');
-const Thread = require('../modules/threads/model');
+const Thread = require('../modules/blogs/model');
 const Reply = require('../modules/replies/model');
 const Report = require('../modules/reports/model');
 const bson = require('bson');

@@ -4,7 +4,7 @@ const jwtUnAuth = require('../middleware/jwtUnAuth');
 const bson = require('bson');
 const User = require('../modules/users/model');
 const Reply = require('../modules/replies/model');
-const Thread = require('../modules/threads/model');
+const Thread = require('../modules/blogs/model');
 
 router.get('/', jwtUnAuth, async (req, res) => {
   const userId = req.userId;

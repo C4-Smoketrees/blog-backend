@@ -1,6 +1,6 @@
 const ObjectId = require('bson').ObjectID;
 const logger = require('../../logging/logger');
-const Thread = require('../threads/model');
+const Thread = require('../blogs/model');
 const Reply = require('../replies/model');
 
 /**
@@ -154,12 +154,12 @@ class User {
       const query = { $push: { threads: thread._id } };
       const res2 = await userCollection.updateOne(filter, query, { upsert: true });
       if (res2.modifiedCount !== 1) {
-        logger.error('Error in publishing draft(adding to the user threads)', {
+        logger.error('Error in publishing draft(adding to the user blogs)', {
           query: query,
           filter: filter,
           response: res2
         });
-        response = { status: false, msg: 'Error in adding to user threads' };
+        response = { status: false, msg: 'Error in adding to user blogs' };
       }
       response = { status: true, threadId: thread._id.toHexString(), draftId: draft._id.toHexString() };
     } catch (e) {

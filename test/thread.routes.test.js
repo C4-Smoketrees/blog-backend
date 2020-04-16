@@ -4,12 +4,12 @@ const assert = chai.assert;
 const bson = require('bson');
 const chaiHttp = require('chai-http');
 const { describe, it } = require('mocha');
-const Thread = require('../modules/threads/model');
+const Thread = require('../modules/blogs/model');
 chai.use(chaiHttp);
 const User = require('../modules/users/model');
 const jwt = require('jsonwebtoken');
 
-describe('# Route test for /threads', function () {
+describe('# Route test for /blogs', function () {
   it('GET /one', async function () {
     let res;
     try {
@@ -22,11 +22,12 @@ describe('# Route test for /threads', function () {
       }, app.locals.threadCollection);
 
       res = await chai.request(app)
-        .get(`/threads/one?threadId=${response.threadId}`)
+        .get(`/blogs/one?threadId=${response.threadId}`)
         .send();
     } catch (e) {
       assert.isNull(e);
     }
+    console.log(res.body);
     assert.equal(res.status, 200);
   });
 
@@ -41,7 +42,7 @@ describe('# Route test for /threads', function () {
         tags: ['route', 'get', 'one', 'thread']
       }, app.locals.threadCollection);
       res = await chai.request(app)
-        .get(`/threads/one?threadId=${response.threadId}`)
+        .get(`/blogs/one?threadId=${response.threadId}`)
         .send();
     } catch (e) {
       assert.isNull(e);
@@ -61,7 +62,7 @@ describe('# Route test for /threads', function () {
       const user = new User({ _id: author1 });
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
       res = await chai.request(app)
-        .post('/threads/delete')
+        .post('/blogs/delete')
         .set({
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
@@ -84,7 +85,7 @@ describe('# Route test for /threads', function () {
       const user = new User({ _id: author1 });
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
       res = await chai.request(app)
-        .post('/threads/update')
+        .post('/blogs/update')
         .set({
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
@@ -108,7 +109,7 @@ describe('# Route test for /threads', function () {
       const user = new User({ _id: author1 });
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
       res = await chai.request(app)
-        .post('/threads/star')
+        .post('/blogs/star')
         .set({
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
@@ -131,7 +132,7 @@ describe('# Route test for /threads', function () {
       const user = new User({ _id: author1 });
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
       res = await chai.request(app)
-        .post('/threads/upvote')
+        .post('/blogs/upvote')
         .set({
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
@@ -155,7 +156,7 @@ describe('# Route test for /threads', function () {
       const user = new User({ _id: author1 });
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
       res = await chai.request(app)
-        .post('/threads/downvote')
+        .post('/blogs/downvote')
         .set({
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
@@ -180,7 +181,7 @@ describe('# Route test for /threads', function () {
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
       await Thread.addDownvote(res2.threadId, token._id, app.locals.threadCollection);
       res = await chai.request(app)
-        .post('/threads/removeDownvote')
+        .post('/blogs/removeDownvote')
         .set({
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
@@ -205,7 +206,7 @@ describe('# Route test for /threads', function () {
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection);
       await Thread.addUpvote(res2.threadId, token._id, app.locals.threadCollection);
       res = await chai.request(app)
-        .post('/threads/removeUpvote')
+        .post('/blogs/removeUpvote')
         .set({
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'

@@ -10,7 +10,7 @@ tags:
   - name: drafts
     description: >
       Paths to create, read, publish, delete and update the draft
-  - name: threads
+  - name: blogs
     description: >
       Paths to read, update, delete and do other operations on draft
   - name: users

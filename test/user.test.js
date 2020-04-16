@@ -3,7 +3,7 @@ const { describe, it, before, after } = require('mocha');
 const app = require('../app');
 const User = require('../modules/users/model');
 const Reply = require('../modules/replies/model');
-const Thread = require('../modules/threads/model');
+const Thread = require('../modules/blogs/model');
 const bson = require('bson');
 
 after(async function () {

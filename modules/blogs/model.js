@@ -223,7 +223,7 @@ class Thread {
       return { status: true, threads: threads, length: length };
     } catch (e) {
       const res = { status: false };
-      logger.error(JSON.stringify({ msg: 'Error in reading all threads', err: e }));
+      logger.error(JSON.stringify({ msg: 'Error in reading all blogs', err: e }));
       return res;
     }
   }
@@ -326,7 +326,7 @@ class Thread {
       return { status: true, threads: threads };
     } catch (e) {
       const res = { status: false, err: e };
-      logger.error(JSON.stringify({ msg: 'Error in reading all threads', err: e }));
+      logger.error(JSON.stringify({ msg: 'Error in reading all blogs', err: e }));
       return res;
     }
   }

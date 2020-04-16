@@ -1,7 +1,7 @@
 const { assert } = require('chai');
 const { describe, before, it, after } = require('mocha');
 const app = require('../app');
-const Thread = require('../modules/threads/model');
+const Thread = require('../modules/blogs/model');
 const bson = require('bson');
 
 after(async function () {
@@ -59,7 +59,7 @@ describe('# Threads test-suite', function () {
         assert.isTrue(false);
       }
     });
-    it('Real all threads', async function () {
+    it('Real all blogs', async function () {
       // For Callback (Passing)
       try {
         const thread = new Thread({

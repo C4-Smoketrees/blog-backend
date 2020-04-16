@@ -32,7 +32,7 @@ app.use(compression());
 
 // Logging
 app.use('/drafts', require('./routes/draft'));
-app.use('/threads', require('./routes/thread'));
+app.use('/blogs', require('./routes/thread'));
 app.use('/reports', require('./routes/report'));
 app.use('/replies', require('./routes/reply'));
 
