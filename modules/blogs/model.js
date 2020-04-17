@@ -257,7 +257,7 @@ class Blog {
     return func();
   }
 
-  static async readTags (tagCollection) {
+  static async readAllTags (tagCollection) {
     try {
       const res = await tagCollection.findOne({});
       if (!res) {

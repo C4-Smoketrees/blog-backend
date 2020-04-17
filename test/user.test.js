@@ -191,8 +191,7 @@ describe('# User test-suite', function () {
       const user = new User({ _id: author1 });
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
       assert.isTrue(res2.status);
-      const res3 = await Blog.readTags(app.locals.tagCollection);
-
+      const res3 = await Blog.readAllTags(app.locals.tagCollection);
       assert.isTrue(res3.status);
     });
   });

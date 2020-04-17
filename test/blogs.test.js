@@ -10,13 +10,18 @@ after(async function () {
 before(async function () {
   await app.locals.dbClient;
   try {
-    (await app.locals.blogCollection).drop();
+    await app.locals.blogCollection.drop();
   } catch (e) {
   }
 });
 describe('# Blogs test-suite', function () {
   describe('# Crud Operations', function () {
     // Create a new Blog and update it
+    it('Return false if no tags are found', async function () {
+      await app.locals.tagCollection.drop();
+      const res = await Blog.readAllTags(app.locals.tagCollection);
+      assert.isFalse(res.status);
+    });
     it('Create a new Blog and update it', async function () {
       // For Callback (Passing)
       try {
@@ -210,6 +215,41 @@ describe('# Blogs test-suite', function () {
     });
     it('Catch error in deleting blog by ID', async function () {
       const res = await Blog.deleteBlogUsingId(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), null);
+      assert.isFalse(res.status);
+      assert.isNotNull(res.err);
+    });
+    it('Catch error in getting all tags', async function () {
+      const res = await Blog.readAllTags(null);
+      assert.isFalse(res.status);
+      assert.isNotNull(res.err);
+    });
+    it('Catch error in updating stars', async function () {
+      const res = await Blog.updateStars(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), 'inc', null);
+      assert.isFalse(res.status);
+      assert.isNotNull(res.err);
+    });
+    it('Catch error in reading all blogs by tag', async function () {
+      const res = await Blog.readBlogByTag('something', null);
+      assert.isFalse(res.status);
+      assert.isNotNull(res.err);
+    });
+    it('Catch error in adding upvotes', async function () {
+      const res = await Blog.addUpvote(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), new bson.ObjectID(bson.ObjectID.generate()).toHexString(), null);
+      assert.isFalse(res.status);
+      assert.isNotNull(res.err);
+    });
+    it('Catch error in adding downvotes', async function () {
+      const res = await Blog.addDownvote(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), new bson.ObjectID(bson.ObjectID.generate()).toHexString(), null);
+      assert.isFalse(res.status);
+      assert.isNotNull(res.err);
+    });
+    it('Catch error in removing upvotes', async function () {
+      const res = await Blog.removeUpvote(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), new bson.ObjectID(bson.ObjectID.generate()).toHexString(), null);
+      assert.isFalse(res.status);
+      assert.isNotNull(res.err);
+    });
+    it('Catch error in removing downvotes', async function () {
+      const res = await Blog.removeDownvote(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), new bson.ObjectID(bson.ObjectID.generate()).toHexString(), null);
       assert.isFalse(res.status);
       assert.isNotNull(res.err);
     });
