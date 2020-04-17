@@ -13,8 +13,8 @@ async function threadReport (threadId, report, token) {
   return body;
 }
 
-async function replyReport (replyId, report, token) {
-  const res = await fetch(`${url}/reports/reply?replyId=${replyId}`, {
+async function commentReport (commentId, report, token) {
+  const res = await fetch(`${url}/reports/comment?commentId=${commentId}`, {
     method: 'POST',
     body: JSON.stringify({ report: report }), // ),
     headers: { 'Content-Type': 'application/json', Authorization: token },
@@ -26,5 +26,5 @@ async function replyReport (replyId, report, token) {
 
 module.exports = {
   threadReport,
-  replyReport
+  commentReport
 };

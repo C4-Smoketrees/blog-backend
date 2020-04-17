@@ -1,7 +1,7 @@
 const ObjectId = require('bson').ObjectID;
 const logger = require('../../logging/logger');
 const Blog = require('../blogs/model');
-const Reply = require('../replies/model');
+const Comment = require('../comments/model');
 
 /**
  * User class represents the business logic
@@ -253,47 +253,47 @@ class User {
 
   /**
    *
-   * @param {Reply} reply
+   * @param {Comment} comment
    * @param id
    * @param userCollection
    * @param blogCollection
-   * @param replyCollection
+   * @param commentCollection
    * @returns {Promise<{status: boolean}>}
    */
-  async addReply (reply, id, userCollection, blogCollection, replyCollection) {
-    const res1 = await Reply.createReply(reply, id, blogCollection, replyCollection);
+  async addComment (comment, id, userCollection, blogCollection, commentCollection) {
+    const res1 = await Comment.createComment(comment, id, blogCollection, commentCollection);
     if (!res1.status) {
       return { status: false };
     }
-    const replyId = res1.replyId;
+    const commentId = res1.commentId;
     try {
       const filter = { _id: this._id };
-      const update = { $push: { replies: ObjectId.createFromHexString(replyId) } };
+      const update = { $push: { replies: ObjectId.createFromHexString(commentId) } };
       const res2 = await userCollection.updateOne(filter, update);
       if (res2.modifiedCount !== 1) {
         return { status: false };
       }
     } catch (e) {
-      logger.error(`Error in adding reply to user:${this._id.toHexString()} replyId:${replyId}`);
-      return { status: false, replyId: res1.replyId };
+      logger.error(`Error in adding comment to user:${this._id.toHexString()} commentId:${commentId}`);
+      return { status: false, commentId: res1.commentId };
     }
-    return { status: true, replyId: res1.replyId };
+    return { status: true, commentId: res1.commentId };
   }
 
-  async deleteReply (replyId, id, userCollection, blogCollection, replyCollection) {
-    const res1 = await Reply.deleteReply(replyId, id, blogCollection, replyCollection);
+  async deleteComment (commentId, id, userCollection, blogCollection, commentCollection) {
+    const res1 = await Comment.deleteComment(commentId, id, blogCollection, commentCollection);
     if (!res1.status) {
       return { status: false };
     }
     try {
       const filter = { _id: this._id };
-      const update = { $push: { replies: ObjectId.createFromHexString(replyId) } };
+      const update = { $push: { replies: ObjectId.createFromHexString(commentId) } };
       const res2 = await userCollection.updateOne(filter, update);
       if (res2.modifiedCount !== 1) {
         return { status: false };
       }
     } catch (e) {
-      logger.error(`Error in deleting reply from user:${this._id.toHexString()} replyId:${replyId}`);
+      logger.error(`Error in deleting comment from user:${this._id.toHexString()} commentId:${commentId}`);
       return { status: false };
     }
     return { status: true };

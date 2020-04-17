@@ -60,37 +60,37 @@ class Report {
     return func();
   }
 
-  static async createReplyReport (replyId, report, replyCollection) {
+  static async createCommentReport (commentId, report, commentCollection) {
     try {
       let response;
-      const replyObjectId = bson.ObjectID.createFromHexString(replyId);
+      const commentObjectId = bson.ObjectID.createFromHexString(commentId);
       let filter = {
-        _id: replyObjectId,
+        _id: commentObjectId,
         'reports.userId': report.userId
       };
-      const reply = await replyCollection.findOne(filter);
-      if (reply == null) {
+      const comment = await commentCollection.findOne(filter);
+      if (comment == null) {
         filter = {
-          _id: replyObjectId
+          _id: commentObjectId
         };
         report._id = new bson.ObjectID(bson.ObjectID.generate());
         const query = { $push: { reports: report } };
-        const res = await replyCollection.updateOne(filter, query);
+        const res = await commentCollection.updateOne(filter, query);
         if (res.modifiedCount === 1) {
           response = { status: true, reportId: report._id.toHexString(), msg: 'success' };
           logger.debug(`Reported report_id:${report._id.toHexString()}`);
         } else {
-          logger.warn(`Unable to report replyId:${replyId} userId:${report.userId.toHexString()}`);
+          logger.warn(`Unable to report commentId:${commentId} userId:${report.userId.toHexString()}`);
           response = { status: false, err: `matched:${res.matchedCount} modified:${res.modifiedCount}` };
         }
       } else {
         response = { status: false, err: 'already reported' };
-        logger.debug(`Already reported replyId:${replyId}  user_id:${report.userId.toHexString()}`);
+        logger.debug(`Already reported commentId:${commentId}  user_id:${report.userId.toHexString()}`);
       }
       return response;
     } catch (e) {
       const response = { status: false, err: e.message };
-      logger.error(`Error in creating report for the user and reply:${replyId}`);
+      logger.error(`Error in creating report for the user and comment:${commentId}`);
       return response;
     }
   }

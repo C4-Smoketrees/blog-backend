@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const { describe, it, before, after } = require('mocha');
 const app = require('../app');
 const User = require('../modules/users/model');
-const Reply = require('../modules/replies/model');
+const Comment = require('../modules/comments/model');
 const Blog = require('../modules/blogs/model');
 const bson = require('bson');
 
@@ -148,8 +148,8 @@ describe('# User test-suite', function () {
       const res5 = await Blog.readBlogUsingId(res2.blogId, app.locals.blogCollection);
       assert.equal(res5.blog.stars, 0);
     });
-    it('create a reply', async function () {
-      const draft = { content: 'reply content', title: 'reply title' };
+    it('create a comment', async function () {
+      const draft = { content: 'comment content', title: 'comment title' };
       const author1 = new bson.ObjectID(bson.ObjectID.generate());
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
       assert.isTrue(res1.status);
@@ -157,15 +157,15 @@ describe('# User test-suite', function () {
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
 
       assert.isTrue(res2.status);
-      const reply = new Reply({ content: 'reply content', author: author1 });
-      const res3 = await user.addReply(reply, { blogId: res2.blogId },
-        app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
+      const comment = new Comment({ content: 'comment content', author: author1 });
+      const res3 = await user.addComment(comment, { blogId: res2.blogId },
+        app.locals.userCollection, app.locals.blogCollection, app.locals.commentCollection);
       assert.isTrue(res3.status);
-      const res4 = await Reply.readReply(reply._id.toHexString(), app.locals.replyCollection);
-      assert.equal(res4.reply.content, 'reply content');
+      const res4 = await Comment.readComment(comment._id.toHexString(), app.locals.commentCollection);
+      assert.equal(res4.comment.content, 'comment content');
     });
-    it('delete a reply', async function () {
-      const draft = { content: 'delete reply content', title: 'delete reply title' };
+    it('delete a comment', async function () {
+      const draft = { content: 'delete comment content', title: 'delete comment title' };
       const author1 = new bson.ObjectID(bson.ObjectID.generate());
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
       assert.isTrue(res1.status);
@@ -173,12 +173,12 @@ describe('# User test-suite', function () {
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
 
       assert.isTrue(res2.status);
-      const reply = new Reply({ content: 'reply content', author: author1 });
-      const res3 = await user.addReply(reply, { blogId: res2.blogId },
-        app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
+      const comment = new Comment({ content: 'comment content', author: author1 });
+      const res3 = await user.addComment(comment, { blogId: res2.blogId },
+        app.locals.userCollection, app.locals.blogCollection, app.locals.commentCollection);
       assert.isTrue(res3.status);
-      const res4 = await user.deleteReply(reply._id.toHexString(), { blogId: res2.blogId },
-        app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
+      const res4 = await user.deleteComment(comment._id.toHexString(), { blogId: res2.blogId },
+        app.locals.userCollection, app.locals.blogCollection, app.locals.commentCollection);
       assert.isTrue(res4.status);
       const res5 = await Blog.readBlogUsingId(res2.blogId, app.locals.blogCollection);
       assert.equal(res5.blog.replies.length, 0);

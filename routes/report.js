@@ -31,9 +31,9 @@ router.post('/blog', jwtAuth, async (req, res) => {
   }
 });
 
-router.post('/reply', jwtAuth, async (req, res) => {
+router.post('/comment', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const replyId = req.query.replyId;
+  const commentId = req.query.commentId;
 
   const report = req.body.report;
 
@@ -49,11 +49,11 @@ router.post('/reply', jwtAuth, async (req, res) => {
     return;
   }
 
-  const response = await Report.createReplyReport(replyId, {
+  const response = await Report.createCommentReport(commentId, {
     reportReason: report.reportReason,
     description: report.description,
     userId: bson.ObjectId.createFromHexString(userId)
-  }, req.app.locals.replyCollection);
+  }, req.app.locals.commentCollection);
   if (response.status) {
     res.status(200).json(response);
   } else {

@@ -1,5 +1,5 @@
 const draft = require('./draft');
-const reply = require('./reply');
+const comment = require('./comment');
 const report = require('./report');
 const thread = require('./thread');
 
@@ -13,15 +13,15 @@ ForumClient.prototype.getAllDraft = draft.getAllDraft;
 ForumClient.prototype.deleteDraft = draft.deleteDraft;
 ForumClient.prototype.publishDraft = draft.publishDraft;
 
-ForumClient.prototype.getReply = reply.getReply;
-ForumClient.prototype.newReply = reply.newReply;
-ForumClient.prototype.updateReply = reply.updateReply;
-ForumClient.prototype.upvoteReply = reply.upvoteReply;
-ForumClient.prototype.downvoteReply = reply.downvoteReply;
-ForumClient.prototype.removeUpvoteReply = reply.removeUpvoteReply;
-ForumClient.prototype.removeDownvoteReply = reply.removeDownvoteReply;
+ForumClient.prototype.getComment = comment.getComment;
+ForumClient.prototype.newComment = comment.newComment;
+ForumClient.prototype.updateComment = comment.updateComment;
+ForumClient.prototype.upvoteComment = comment.upvoteComment;
+ForumClient.prototype.downvoteComment = comment.downvoteComment;
+ForumClient.prototype.removeUpvoteComment = comment.removeUpvoteComment;
+ForumClient.prototype.removeDownvoteComment = comment.removeDownvoteComment;
 
-ForumClient.prototype.replyReport = report.replyReport;
+ForumClient.prototype.commentReport = report.commentReport;
 ForumClient.prototype.threadReport = report.threadReport;
 
 ForumClient.prototype.starThread = thread.starThread;

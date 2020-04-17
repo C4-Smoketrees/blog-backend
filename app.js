@@ -16,7 +16,7 @@ const dbConn = async () => {
     app.locals.dbClient = await dbPromise;
     app.locals.db = await app.locals.dbClient.db('forum');
     app.locals.blogCollection = await app.locals.db.collection('blogs');
-    app.locals.replyCollection = await app.locals.db.collection('replies');
+    app.locals.commentCollection = await app.locals.db.collection('comments');
     app.locals.userCollection = await app.locals.db.collection('users');
     app.locals.tagCollection = await app.locals.db.collection('tags');
   } catch (e) {
@@ -36,7 +36,7 @@ app.use(cors());
 app.use('/drafts', require('./routes/draft'));
 app.use('/blogs', require('./routes/blogs'));
 app.use('/reports', require('./routes/report'));
-app.use('/replies', require('./routes/reply'));
+app.use('/comments', require('./routes/comment'));
 
 app.use('*', function (_req, res) {
   res.status(400).json({ status: false, message: 'Resource Not found' });

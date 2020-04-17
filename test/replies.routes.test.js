@@ -4,12 +4,12 @@ const assert = chai.assert;
 const bson = require('bson');
 const chaiHttp = require('chai-http');
 const { describe, it } = require('mocha');
-const Reply = require('../modules/replies/model');
+const Comment = require('../modules/comments/model');
 chai.use(chaiHttp);
 const User = require('../modules/users/model');
 const jwt = require('jsonwebtoken');
 
-describe('# Route test for /replies', function () {
+describe('# Route test for /comments', function () {
   it('test for /', async function () {
     const draft = { content: 'draft content', title: 'draft title', tags: ['#google', '#noob'] };
     const token = jwt.decode('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k');
@@ -20,12 +20,12 @@ describe('# Route test for /replies', function () {
     assert.isTrue(res2.status);
 
     const res = await chai.request(app)
-      .post('/replies')
+      .post('/comments')
       .set({
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'
       })
-      .send({ id: { blogId: res2.blogId }, reply: { content: 'reply' } });
+      .send({ id: { blogId: res2.blogId }, comment: { content: 'comment' } });
 
     assert.equal(res.status, 200);
   });
@@ -37,18 +37,18 @@ describe('# Route test for /replies', function () {
     const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
     const user = new User({ _id: author1 });
     const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
-    const res3 = await user.addReply({
-      content: 'reply',
+    const res3 = await user.addComment({
+      content: 'comment',
       author: author1
-    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
+    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.commentCollection);
 
     const res = await chai.request(app)
-      .post('/replies/delete')
+      .post('/comments/delete')
       .set({
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'
       })
-      .send({ id: { blogId: res2.blogId }, replyId: res3.replyId });
+      .send({ id: { blogId: res2.blogId }, commentId: res3.commentId });
 
     assert.equal(res.status, 200);
   });
@@ -61,20 +61,20 @@ describe('# Route test for /replies', function () {
     const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
     const user = new User({ _id: author1 });
     const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
-    const res3 = await user.addReply({
-      content: 'reply',
+    const res3 = await user.addComment({
+      content: 'comment',
       author: author1
-    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
+    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.commentCollection);
 
     const res = await chai.request(app)
-      .post('/replies/update')
+      .post('/comments/update')
       .set({
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'
       })
       .send({
-        reply: {
-          _id: res3.replyId,
+        comment: {
+          _id: res3.commentId,
           content: 'update'
         }
       });
@@ -89,19 +89,19 @@ describe('# Route test for /replies', function () {
     const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
     const user = new User({ _id: author1 });
     const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
-    const res3 = await user.addReply({
-      content: 'reply',
+    const res3 = await user.addComment({
+      content: 'comment',
       author: author1
-    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
+    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.commentCollection);
 
     const res = await chai.request(app)
-      .post('/replies/upvote')
+      .post('/comments/upvote')
       .set({
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'
       })
       .send({
-        replyId: res3.replyId
+        commentId: res3.commentId
       });
 
     assert.equal(res.status, 200);
@@ -115,19 +115,19 @@ describe('# Route test for /replies', function () {
     const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
     const user = new User({ _id: author1 });
     const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
-    const res3 = await user.addReply({
-      content: 'reply',
+    const res3 = await user.addComment({
+      content: 'comment',
       author: author1
-    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
+    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.commentCollection);
 
     const res = await chai.request(app)
-      .post('/replies/downvote')
+      .post('/comments/downvote')
       .set({
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'
       })
       .send({
-        replyId: res3.replyId
+        commentId: res3.commentId
       });
 
     assert.equal(res.status, 200);
@@ -141,22 +141,22 @@ describe('# Route test for /replies', function () {
     const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
     const user = new User({ _id: author1 });
     const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
-    const res3 = await user.addReply({
-      content: 'reply',
+    const res3 = await user.addComment({
+      content: 'comment',
       author: author1
-    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
+    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.commentCollection);
 
-    await Reply.addReplyUpvote(res3.replyId, token._id, app.locals.replyCollection);
+    await Comment.addCommentUpvote(res3.commentId, token._id, app.locals.commentCollection);
 
     const res = await chai.request(app)
-      .post('/replies/removeUpvote')
+      .post('/comments/removeUpvote')
       .set({
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'
       })
       .send({
         blogId: res2.blogId,
-        replyId: res3.replyId
+        commentId: res3.commentId
       });
 
     assert.equal(res.status, 200);
@@ -170,22 +170,22 @@ describe('# Route test for /replies', function () {
     const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection);
     const user = new User({ _id: author1 });
     const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.blogCollection);
-    const res3 = await user.addReply({
-      content: 'reply',
+    const res3 = await user.addComment({
+      content: 'comment',
       author: author1
-    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.replyCollection);
+    }, { blogId: res2.blogId }, app.locals.userCollection, app.locals.blogCollection, app.locals.commentCollection);
 
-    await Reply.addReplyDownvote(res3.replyId, token._id, app.locals.replyCollection);
+    await Comment.addCommentDownvote(res3.commentId, token._id, app.locals.commentCollection);
 
     const res = await chai.request(app)
-      .post('/replies/upvote')
+      .post('/comments/upvote')
       .set({
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'
       })
       .send({
         blogId: res2.blogId,
-        replyId: res3.replyId
+        commentId: res3.commentId
       });
 
     assert.equal(res.status, 200);

@@ -17,7 +17,7 @@ class Blog {
    * @param {string} blog.title Blog's title
    * @param {bson.ObjectID=auto_generate} [blog._id] Id for the object
    * @param {string} blog.content Content for the Blog
-   * @param {array(Replies)=[]} [blog.replies] Replies array contains Replies
+   * @param {array(Replies)=[]} [blog.comments] Replies array contains Replies
    * @param {array(Reports)=[]} [blog.reports] Reports array contains Reports
    * @param {number=time.now()} [blog.dateTime] Datetime
    * @param {array(bson.ObjectID)=[]} [blog.upvotes] Upvotes array

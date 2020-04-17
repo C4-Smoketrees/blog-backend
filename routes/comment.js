@@ -3,13 +3,13 @@ const jwtAuth = require('../middleware/jwtAuth');
 const jwtUnAuth = require('../middleware/jwtUnAuth');
 const bson = require('bson');
 const User = require('../modules/users/model');
-const Reply = require('../modules/replies/model');
+const Comment = require('../modules/comments/model');
 const Blog = require('../modules/blogs/model');
 
 router.get('/', jwtUnAuth, async (req, res) => {
   const userId = req.userId;
-  const replyId = req.query.replyId;
-  const response = await Reply.readReply(replyId, req.app.locals.replyCollection, userId);
+  const commentId = req.query.commentId;
+  const response = await Comment.readComment(commentId, req.app.locals.commentCollection, userId);
 
   if (response.status) {
     res.status(200).json(response);
@@ -23,11 +23,11 @@ router.get('/', jwtUnAuth, async (req, res) => {
 router.post('/', jwtAuth, async (req, res) => {
   const userId = req.userId;
   const id = req.body.id;
-  const reply = req.body.reply;
-  reply.author = bson.ObjectID.createFromHexString(userId);
+  const comment = req.body.comment;
+  comment.author = bson.ObjectID.createFromHexString(userId);
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) });
-  const response = await user.addReply(reply, id, req.app.locals.userCollection,
-    req.app.locals.blogCollection, req.app.locals.replyCollection);
+  const response = await user.addComment(comment, id, req.app.locals.userCollection,
+    req.app.locals.blogCollection, req.app.locals.commentCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -40,10 +40,10 @@ router.post('/', jwtAuth, async (req, res) => {
 router.post('/delete', jwtAuth, async (req, res) => {
   const userId = req.userId;
   const id = req.body.id;
-  const replyId = req.body.replyId;
+  const commentId = req.body.commentId;
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) });
-  const response = await user.deleteReply(replyId, id, req.app.locals.userCollection,
-    req.app.locals.blogCollection, req.app.locals.replyCollection);
+  const response = await user.deleteComment(commentId, id, req.app.locals.userCollection,
+    req.app.locals.blogCollection, req.app.locals.commentCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -55,10 +55,10 @@ router.post('/delete', jwtAuth, async (req, res) => {
 
 router.post('/update', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const reply = req.body.reply;
+  const comment = req.body.comment;
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) });
-  reply._id = bson.ObjectID.createFromHexString(reply._id);
-  const response = await Reply.updateReplyContent(reply, user._id.toHexString(), req.app.locals.replyCollection);
+  comment._id = bson.ObjectID.createFromHexString(comment._id);
+  const response = await Comment.updateCommentContent(comment, user._id.toHexString(), req.app.locals.commentCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -70,9 +70,9 @@ router.post('/update', jwtAuth, async (req, res) => {
 
 router.post('/upvote', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const replyId = req.body.replyId;
-  await Reply.removeReplyDownvote(replyId, userId, req.app.locals.replyCollection);
-  const response = await Reply.addReplyUpvote(replyId, userId, req.app.locals.replyCollection);
+  const commentId = req.body.commentId;
+  await Comment.removeCommentDownvote(commentId, userId, req.app.locals.commentCollection);
+  const response = await Comment.addCommentUpvote(commentId, userId, req.app.locals.commentCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -84,9 +84,9 @@ router.post('/upvote', jwtAuth, async (req, res) => {
 
 router.post('/downvote', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const replyId = req.body.replyId;
-  await Reply.removeReplyUpvote(replyId, userId, req.app.locals.replyCollection);
-  const response = await Reply.addReplyDownvote(replyId, userId, req.app.locals.replyCollection);
+  const commentId = req.body.commentId;
+  await Comment.removeCommentUpvote(commentId, userId, req.app.locals.commentCollection);
+  const response = await Comment.addCommentDownvote(commentId, userId, req.app.locals.commentCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -98,8 +98,8 @@ router.post('/downvote', jwtAuth, async (req, res) => {
 
 router.post('/removeUpvote', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const replyId = req.body.replyId;
-  const response = await Reply.removeReplyUpvote(replyId, userId, req.app.locals.replyCollection);
+  const commentId = req.body.commentId;
+  const response = await Comment.removeCommentUpvote(commentId, userId, req.app.locals.commentCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {
@@ -111,8 +111,8 @@ router.post('/removeUpvote', jwtAuth, async (req, res) => {
 
 router.post('/removeDownvote', jwtAuth, async (req, res) => {
   const userId = req.userId;
-  const replyId = req.body.replyId;
-  const response = await Blog.removeDownvote(replyId, userId, req.app.locals.replyCollection);
+  const commentId = req.body.commentId;
+  const response = await Blog.removeDownvote(commentId, userId, req.app.locals.commentCollection);
   if (response.status) {
     res.status(200).json(response);
   } else if (response.err) {

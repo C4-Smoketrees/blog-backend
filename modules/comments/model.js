@@ -1,7 +1,7 @@
 const bson = require('bson');
 const logger = require('../../logging/logger');
 
-class Reply {
+class Comment {
   constructor (object) {
     this._id = object._id;
     this.content = object.content;
@@ -16,141 +16,141 @@ class Reply {
     this.reports = object.reports;
   }
 
-  static async createReply (reply, id, blogCollection, replyCollection) {
+  static async createComment (comment, id, blogCollection, commentCollection) {
     let response;
-    reply.upvotes = [];
-    reply.downvotes = [];
-    reply.upvotesCount = 0;
-    reply.downvotesCount = 0;
-    reply.reports = [];
-    reply.replies = [];
+    comment.upvotes = [];
+    comment.downvotes = [];
+    comment.upvotesCount = 0;
+    comment.downvotesCount = 0;
+    comment.reports = [];
+    comment.replies = [];
 
     let filter;
 
     try {
-      reply._id = new bson.ObjectID(bson.ObjectId.generate());
-      reply.dateTime = Date.now();
-      reply.lastUpdate = Date.now();
+      comment._id = new bson.ObjectID(bson.ObjectId.generate());
+      comment.dateTime = Date.now();
+      comment.lastUpdate = Date.now();
       const query = {
         $push: {
-          replies: reply._id
+          replies: comment._id
         }
       };
       let res;
       if (id.blogId) {
         filter = { _id: bson.ObjectID.createFromHexString(id.blogId) };
         res = await blogCollection.updateOne(filter, query);
-      } else if (id.replyId) {
-        filter = { _id: bson.ObjectID.createFromHexString(id.replyId) };
-        res = await replyCollection.updateOne(filter, query);
+      } else if (id.commentId) {
+        filter = { _id: bson.ObjectID.createFromHexString(id.commentId) };
+        res = await commentCollection.updateOne(filter, query);
       } else {
-        return { status: false, msg: 'blogId or replyId missing' };
+        return { status: false, msg: 'blogId or commentId missing' };
       }
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to create a reply for blog:${id.blogId} reply:${id.reply.blogId} replyId:${reply._id}`
+          msg: `Unable to create a comment for blog:${id.blogId} comment:${id.comment.blogId} commentId:${comment._id}`
         };
         logger.debug(response.msg);
       } else {
-        res = await replyCollection.insertOne(reply);
+        res = await commentCollection.insertOne(comment);
         response = {
           status: true,
           msg: 'success',
-          replyId: reply._id.toHexString()
+          commentId: comment._id.toHexString()
         };
-        logger.debug(`New reply for blog:${id.blogId}  reply:${id.replyId} replyId:${reply._id}`);
+        logger.debug(`New comment for blog:${id.blogId}  comment:${id.commentId} commentId:${comment._id}`);
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       };
-      logger.error(`error reply for blog:${id.blogId}  reply:${id.replyId} replyId:${reply._id}`, e);
+      logger.error(`error comment for blog:${id.blogId}  comment:${id.commentId} commentId:${comment._id}`, e);
     }
     return response;
   }
 
-  static async updateReplyContent (reply, userId, replyCollection) {
+  static async updateCommentContent (comment, userId, commentCollection) {
     let response;
     try {
-      reply.author = bson.ObjectID.createFromHexString(userId);
+      comment.author = bson.ObjectID.createFromHexString(userId);
       const filter = {
-        _id: reply._id,
-        author: reply.author
+        _id: comment._id,
+        author: comment.author
       };
-      const res = await replyCollection.updateOne(filter, { $set: reply });
+      const res = await commentCollection.updateOne(filter, { $set: comment });
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to update content for reply a reply for replyId:${reply._id}`
+          msg: `Unable to update content for comment a comment for commentId:${comment._id}`
         };
         logger.debug(response.msg);
       } else {
         response = {
           status: true,
           msg: 'success',
-          replyId: reply._id.toHexString()
+          commentId: comment._id.toHexString()
         };
-        logger.debug(`Updated reply for replyId:${reply._id}`);
+        logger.debug(`Updated comment for commentId:${comment._id}`);
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       };
-      logger.error(`Unable to update reply for replyId:${reply._id}`);
+      logger.error(`Unable to update comment for commentId:${comment._id}`);
     }
     return response;
   }
 
-  static async deleteReply (replyId, id, blogCollection, replyCollection) {
+  static async deleteComment (commentId, id, blogCollection, commentCollection) {
     let response;
     try {
       let filter;
       let res;
 
       const query = {
-        $pull: { replies: bson.ObjectID.createFromHexString(replyId) }
+        $pull: { replies: bson.ObjectID.createFromHexString(commentId) }
       };
       if (id.blogId) {
         filter = { _id: bson.ObjectID.createFromHexString(id.blogId) };
         res = await blogCollection.updateOne(filter, query);
-      } else if (id.replyId) {
-        filter = { _id: bson.ObjectID.createFromHexString(id.replyId) };
-        res = await replyCollection.updateOne(filter, query);
+      } else if (id.commentId) {
+        filter = { _id: bson.ObjectID.createFromHexString(id.commentId) };
+        res = await commentCollection.updateOne(filter, query);
       } else {
-        return { status: false, msg: 'blogId or replyId missing' };
+        return { status: false, msg: 'blogId or commentId missing' };
       }
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to delete reply blog:${id.blogId} reply:${id.replyId} replyId:${replyId}`
+          msg: `Unable to delete comment blog:${id.blogId} comment:${id.commentId} commentId:${commentId}`
         };
         logger.debug(response.msg);
       } else {
-        await replyCollection.deleteOne({ _id: bson.ObjectID.createFromHexString(replyId) });
+        await commentCollection.deleteOne({ _id: bson.ObjectID.createFromHexString(commentId) });
         response = {
           status: true,
           msg: 'success',
-          replyId: replyId
+          commentId: commentId
         };
-        logger.debug(`deleted reply for blog:${id.blogId} reply:${id.replyId} replyId:${replyId}`);
+        logger.debug(`deleted comment for blog:${id.blogId} comment:${id.commentId} commentId:${commentId}`);
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       };
-      logger.error(`Unable to delete reply for blog:${id.blogId} reply:${id.replyId}`, e);
+      logger.error(`Unable to delete comment for blog:${id.blogId} comment:${id.commentId}`, e);
     }
     return response;
   }
 
-  static async readReply (replyId, replyCollection, userId) {
+  static async readComment (commentId, commentCollection, userId) {
     try {
       const filter = {
-        _id: bson.ObjectID.createFromHexString(replyId)
+        _id: bson.ObjectID.createFromHexString(commentId)
       };
 
       let projection;
@@ -185,22 +185,22 @@ class Reply {
           lastUpdate: 1
         };
       }
-      const reply = await replyCollection.findOne(filter, { projection: projection });
-      if (reply) {
-        return { status: true, reply: reply };
+      const comment = await commentCollection.findOne(filter, { projection: projection });
+      if (comment) {
+        return { status: true, comment: comment };
       } else {
-        logger.debug(`no user found for user:${replyId}`);
+        logger.debug(`no user found for user:${commentId}`);
         return { status: false };
       }
     } catch (e) {
-      logger.debug(`error in finding user:${replyId}`, e);
+      logger.debug(`error in finding user:${commentId}`, e);
       return { status: false, err: e };
     }
   }
 
-  static async addReplyUpvote (replyId, userId, replyCollection) {
+  static async addCommentUpvote (commentId, userId, commentCollection) {
     const filter = {
-      _id: bson.ObjectID.createFromHexString(replyId)
+      _id: bson.ObjectID.createFromHexString(commentId)
     };
     const query = {
       $addToSet: { upvotes: bson.ObjectID.createFromHexString(userId) },
@@ -208,34 +208,34 @@ class Reply {
     };
     let response;
     try {
-      const res = await replyCollection.updateOne(filter, query);
+      const res = await commentCollection.updateOne(filter, query);
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to add upvote for reply replyId:${replyId}`
+          msg: `Unable to add upvote for comment commentId:${commentId}`
         };
         logger.debug(response.msg);
       } else {
         response = {
           status: true,
           msg: 'success',
-          replyId: replyId
+          commentId: commentId
         };
-        logger.debug(`Added upvote for reply for replyId:${replyId}`);
+        logger.debug(`Added upvote for comment for commentId:${commentId}`);
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       };
-      logger.error(`Unable add upvote for reply for replyId:${replyId}`);
+      logger.error(`Unable add upvote for comment for commentId:${commentId}`);
     }
     return response;
   }
 
-  static async addReplyDownvote (replyId, userId, replyCollection) {
+  static async addCommentDownvote (commentId, userId, commentCollection) {
     const filter = {
-      _id: bson.ObjectID.createFromHexString(replyId)
+      _id: bson.ObjectID.createFromHexString(commentId)
     };
     const query = {
       $addToSet: { downvotes: bson.ObjectID.createFromHexString(userId) },
@@ -243,35 +243,35 @@ class Reply {
     };
     let response;
     try {
-      const res = await replyCollection.updateOne(filter, query);
+      const res = await commentCollection.updateOne(filter, query);
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to add downvote for reply replyId:${replyId}`
+          msg: `Unable to add downvote for comment commentId:${commentId}`
         };
         logger.debug(response.msg);
       } else {
         response = {
           status: true,
           msg: 'success',
-          replyId: replyId
+          commentId: commentId
         };
-        logger.debug(`Added downvote for reply for replyId:${replyId}`);
+        logger.debug(`Added downvote for comment for commentId:${commentId}`);
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       };
-      logger.error(`Unable add downvote for reply for replyId:${replyId}`);
+      logger.error(`Unable add downvote for comment for commentId:${commentId}`);
     }
     return response;
   }
 
-  static async removeReplyUpvote (replyId, userId, replyCollection) {
+  static async removeCommentUpvote (commentId, userId, commentCollection) {
     const user = bson.ObjectID.createFromHexString(userId);
     const filter = {
-      _id: bson.ObjectID.createFromHexString(replyId),
+      _id: bson.ObjectID.createFromHexString(commentId),
       upvotes: user
     };
 
@@ -281,35 +281,35 @@ class Reply {
     };
     let response;
     try {
-      const res = await replyCollection.updateOne(filter, query);
+      const res = await commentCollection.updateOne(filter, query);
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to remove upvote for reply replyId:${replyId}`
+          msg: `Unable to remove upvote for comment commentId:${commentId}`
         };
         logger.debug(response.msg);
       } else {
         response = {
           status: true,
           msg: 'success',
-          replyId: replyId
+          commentId: commentId
         };
-        logger.debug(`remove upvote for reply for replyId:${replyId}`);
+        logger.debug(`remove upvote for comment for commentId:${commentId}`);
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       };
-      logger.error(`Unable to remove upvote for reply for replyId:${replyId}`);
+      logger.error(`Unable to remove upvote for comment for commentId:${commentId}`);
     }
     return response;
   }
 
-  static async removeReplyDownvote (replyId, userId, replyCollection) {
+  static async removeCommentDownvote (commentId, userId, commentCollection) {
     const user = bson.ObjectID.createFromHexString(userId);
     const filter = {
-      _id: bson.ObjectID.createFromHexString(replyId),
+      _id: bson.ObjectID.createFromHexString(commentId),
       downvotes: user
     };
     const query = {
@@ -318,30 +318,30 @@ class Reply {
     };
     let response;
     try {
-      const res = await replyCollection.updateOne(filter, query);
+      const res = await commentCollection.updateOne(filter, query);
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to remove downvote for reply replyId:${replyId}`
+          msg: `Unable to remove downvote for comment commentId:${commentId}`
         };
         logger.debug(response.msg);
       } else {
         response = {
           status: true,
           msg: 'success',
-          replyId: replyId
+          commentId: commentId
         };
-        logger.debug(`remove downvote for reply for replyId:${replyId}`);
+        logger.debug(`remove downvote for comment for commentId:${commentId}`);
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       };
-      logger.error(`Unable remove downvote for reply for replyId:${replyId}`);
+      logger.error(`Unable remove downvote for comment for commentId:${commentId}`);
     }
     return response;
   }
 }
 
-module.exports = Reply;
+module.exports = Comment;
