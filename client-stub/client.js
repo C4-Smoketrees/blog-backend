@@ -1,7 +1,7 @@
 const draft = require('./draft');
 const comment = require('./comment');
 const report = require('./report');
-const thread = require('./thread');
+const blog = require('./blog');
 
 const ForumClient = function () {
 };
@@ -22,17 +22,17 @@ ForumClient.prototype.removeUpvoteComment = comment.removeUpvoteComment;
 ForumClient.prototype.removeDownvoteComment = comment.removeDownvoteComment;
 
 ForumClient.prototype.commentReport = report.commentReport;
-ForumClient.prototype.threadReport = report.threadReport;
+ForumClient.prototype.blogReport = report.blogReport;
 
-ForumClient.prototype.starThread = thread.starThread;
-ForumClient.prototype.unstarThread = thread.unstarThread;
-ForumClient.prototype.getOneThread = thread.getOneThread;
-ForumClient.prototype.getAllThread = thread.getAllThread;
-ForumClient.prototype.deleteThread = thread.deleteThread;
-ForumClient.prototype.updateThread = thread.updateThread;
-ForumClient.prototype.upvoteThread = thread.upvoteThread;
-ForumClient.prototype.downvoteThread = thread.downvoteThread;
-ForumClient.prototype.removeUpvoteThread = thread.removeUpvoteThread;
-ForumClient.prototype.removeDownvoteThread = thread.removeDownvoteThread;
+ForumClient.prototype.starBlog = blog.starBlog;
+ForumClient.prototype.unstarBlog = blog.unstarBlog;
+ForumClient.prototype.getOneBlog = blog.getOneBlog;
+ForumClient.prototype.getAllBlog = blog.getAllBlog;
+ForumClient.prototype.deleteBlog = blog.deleteBlog;
+ForumClient.prototype.updateBlog = blog.updateBlog;
+ForumClient.prototype.upvoteBlog = blog.upvoteBlog;
+ForumClient.prototype.downvoteBlog = blog.downvoteBlog;
+ForumClient.prototype.removeUpvoteBlog = blog.removeUpvoteBlog;
+ForumClient.prototype.removeDownvoteBlog = blog.removeDownvoteBlog;
 
 module.exports = new ForumClient();

@@ -2,12 +2,12 @@ const fetch = require('node-fetch');
 const agent = require('./agent');
 const url = require('./url');
 
-async function getOneThread (threadId, token) {
+async function getOneBlog (blogId, token) {
   let auth = '';
   if (token) {
     auth = token;
   }
-  const res = await fetch(`${url}/threads/one?threadId=${threadId}`, {
+  const res = await fetch(`${url}/blogs/one?blogId=${blogId}`, {
     method: 'GET',
     headers: { Authorization: auth },
     agent
@@ -16,12 +16,12 @@ async function getOneThread (threadId, token) {
   return body;
 }
 
-async function getAllThread (token) {
+async function getAllBlog (token) {
   let auth = '';
   if (token) {
     auth = token;
   }
-  const res = await fetch(`${url}/threads/all`, {
+  const res = await fetch(`${url}/blogs/all`, {
     method: 'GET',
     headers: { Authorization: auth },
     agent
@@ -30,27 +30,27 @@ async function getAllThread (token) {
   return body;
 }
 
-async function deleteThread (threadId, token) {
-  const res = await fetch(`${url}/threads/delete`, {
+async function deleteBlog (blogId, token) {
+  const res = await fetch(`${url}/blogs/delete`, {
     method: 'POST',
     headers: { Authorization: token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ _id: threadId }),
+    body: JSON.stringify({ _id: blogId }),
     agent
   });
   const body = res.json();
   return body;
 }
 
-async function updateThread (threadId, thread, token) {
-  const res = await fetch(`${url}/threads/update`, {
+async function updateBlog (blogId, blog, token) {
+  const res = await fetch(`${url}/blogs/update`, {
     method: 'POST',
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      thread: {
-        _id: threadId,
-        content: thread.content,
-        title: thread.title,
-        tags: thread.tags
+      blog: {
+        _id: blogId,
+        content: blog.content,
+        title: blog.title,
+        tags: blog.tags
       }
     }),
     agent
@@ -59,66 +59,66 @@ async function updateThread (threadId, thread, token) {
   return body;
 }
 
-async function upvoteThread (threadId, token) {
-  const res = await fetch(`${url}/threads/upvote`, {
+async function upvoteBlog (blogId, token) {
+  const res = await fetch(`${url}/blogs/upvote`, {
     method: 'POST',
     headers: { Authorization: token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ threadId: threadId }),
+    body: JSON.stringify({ blogId: blogId }),
     agent
   });
   const body = await res.json();
   return body;
 }
 
-async function downvoteThread (threadId, token) {
-  const res = await fetch(`${url}/threads/downvote`, {
+async function downvoteBlog (blogId, token) {
+  const res = await fetch(`${url}/blogs/downvote`, {
     method: 'POST',
     headers: { Authorization: token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ threadId: threadId }),
+    body: JSON.stringify({ blogId: blogId }),
     agent
   });
   const body = await res.json();
   return body;
 }
 
-async function removeUpvoteThread (threadId, token) {
-  const res = await fetch(`${url}/threads/removeUpvote`, {
+async function removeUpvoteBlog (blogId, token) {
+  const res = await fetch(`${url}/blogs/removeUpvote`, {
     method: 'POST',
     headers: { Authorization: token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ threadId: threadId }),
+    body: JSON.stringify({ blogId: blogId }),
     agent
   });
   const body = await res.json();
   return body;
 }
 
-async function removeDownvoteThread (threadId, token) {
-  const res = await fetch(`${url}/threads/removeDownvote`, {
+async function removeDownvoteBlog (blogId, token) {
+  const res = await fetch(`${url}/blogs/removeDownvote`, {
     method: 'POST',
     headers: { Authorization: token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ threadId: threadId }),
+    body: JSON.stringify({ blogId: blogId }),
     agent
   });
   const body = await res.json();
   return body;
 }
 
-async function starThread (threadId, token) {
-  const res = await fetch(`${url}/threads/star`, {
+async function starBlog (blogId, token) {
+  const res = await fetch(`${url}/blogs/star`, {
     method: 'POST',
     headers: { Authorization: token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ threadId: threadId }),
+    body: JSON.stringify({ blogId: blogId }),
     agent
   });
   const body = await res.json();
   return body;
 }
 
-async function unstarThread (threadId, token) {
-  const res = await fetch(`${url}/threads/unstar`, {
+async function unstarBlog (blogId, token) {
+  const res = await fetch(`${url}/blogs/unstar`, {
     method: 'POST',
     headers: { Authorization: token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ threadId: threadId }),
+    body: JSON.stringify({ blogId: blogId }),
     agent
   });
   const body = await res.json();
@@ -126,14 +126,14 @@ async function unstarThread (threadId, token) {
 }
 
 module.exports = {
-  getOneThread,
-  getAllThread,
-  deleteThread,
-  updateThread,
-  upvoteThread,
-  downvoteThread,
-  removeUpvoteThread,
-  removeDownvoteThread,
-  starThread,
-  unstarThread
+  getOneBlog,
+  getAllBlog,
+  deleteBlog,
+  updateBlog,
+  upvoteBlog,
+  downvoteBlog,
+  removeUpvoteBlog,
+  removeDownvoteBlog,
+  starBlog,
+  unstarBlog
 };

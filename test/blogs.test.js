@@ -14,7 +14,7 @@ before(async function () {
   } catch (e) {
   }
 });
-describe('# Threads test-suite', function () {
+describe('# Blogs test-suite', function () {
   describe('# Crud Operations', function () {
     // Create a new Blog and update it
     it('Create a new Blog and update it', async function () {
@@ -63,11 +63,11 @@ describe('# Threads test-suite', function () {
       // For Callback (Passing)
       try {
         const author = new bson.ObjectID(bson.ObjectID.generate());
-        const thread = new Blog({
+        const blog = new Blog({
           author: author,
           content: 'read content'
         });
-        const res = await Blog.createBlog(thread, app.locals.blogCollection);
+        const res = await Blog.createBlog(blog, app.locals.blogCollection);
         assert.isTrue(res.status);
         const res2 = await Blog.readAllBlogs(app.locals.blogCollection);
         assert.isTrue(res2.status);
@@ -80,10 +80,10 @@ describe('# Threads test-suite', function () {
     it('Create a new Blog and delete it', async function () {
       // For Callback (Passing)
       try {
-        const thread = new Blog({ author: new bson.ObjectID(bson.ObjectID.generate()), content: 'delete content' });
-        const res = await Blog.createBlog(thread, app.locals.blogCollection);
+        const blog = new Blog({ author: new bson.ObjectID(bson.ObjectID.generate()), content: 'delete content' });
+        const res = await Blog.createBlog(blog, app.locals.blogCollection);
         assert.isTrue(res.status);
-        const res2 = await Blog.deleteBlogUsingId(thread._id.toHexString(), app.locals.blogCollection);
+        const res2 = await Blog.deleteBlogUsingId(blog._id.toHexString(), app.locals.blogCollection);
         assert.isTrue(res2.status);
         const res3 = await Blog.deleteBlogUsingId(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), app.locals.blogCollection);
         assert.isFalse(res3.status);
@@ -91,20 +91,20 @@ describe('# Threads test-suite', function () {
         assert.isTrue(false);
       }
     });
-    it('Find using thread tag', async function () {
+    it('Find using blog tag', async function () {
       try {
-        const thread = new Blog({
+        const blog = new Blog({
           author: new bson.ObjectID(bson.ObjectID.generate()),
           content: 'tag content',
           tags: ['google', 'noob']
         });
-        let res = await Blog.createBlog(thread, app.locals.blogCollection);
+        let res = await Blog.createBlog(blog, app.locals.blogCollection);
         assert.isTrue(res.status);
-        thread.tags = ['google', 'twitter'];
-        res = await Blog.createBlog(thread, app.locals.blogCollection);
+        blog.tags = ['google', 'twitter'];
+        res = await Blog.createBlog(blog, app.locals.blogCollection);
         assert.isTrue(res.status);
-        thread.tags = ['hello', 'twitter'];
-        res = await Blog.createBlog(thread, app.locals.blogCollection);
+        blog.tags = ['hello', 'twitter'];
+        res = await Blog.createBlog(blog, app.locals.blogCollection);
         assert.isTrue(res.status);
         res = await Blog.readBlogByTag('twitter', app.locals.blogCollection);
 
@@ -140,22 +140,22 @@ describe('# Threads test-suite', function () {
     });
     it('Upvote content', async function () {
       try {
-        const thread = new Blog({
+        const blog = new Blog({
           author: new bson.ObjectID(bson.ObjectID.generate()),
           content: 'upvote content'
         });
-        const res1 = await Blog.createBlog(thread, app.locals.blogCollection);
+        const res1 = await Blog.createBlog(blog, app.locals.blogCollection);
         assert.isTrue(res1.status);
         const user = new bson.ObjectID(bson.ObjectID.generate());
-        const res2 = await Blog.addUpvote(thread._id.toHexString(), user.toHexString(), app.locals.blogCollection);
+        const res2 = await Blog.addUpvote(blog._id.toHexString(), user.toHexString(), app.locals.blogCollection);
         assert.isTrue(res2.status);
-        const res3 = await Blog.addUpvote(thread._id.toHexString(), user.toHexString(), app.locals.blogCollection);
+        const res3 = await Blog.addUpvote(blog._id.toHexString(), user.toHexString(), app.locals.blogCollection);
         assert.isFalse(res3.status);
-        const res4 = await Blog.removeUpvote(thread._id.toHexString(), user.toHexString(), app.locals.blogCollection);
+        const res4 = await Blog.removeUpvote(blog._id.toHexString(), user.toHexString(), app.locals.blogCollection);
         assert.isTrue(res4.status);
-        const res6 = await Blog.removeUpvote(thread._id.toHexString(), user.toHexString(), app.locals.blogCollection);
+        const res6 = await Blog.removeUpvote(blog._id.toHexString(), user.toHexString(), app.locals.blogCollection);
         assert.isFalse(res6.status);
-        const res5 = await Blog.addUpvote(thread._id.toHexString(), user.toHexString(), app.locals.blogCollection);
+        const res5 = await Blog.addUpvote(blog._id.toHexString(), user.toHexString(), app.locals.blogCollection);
         assert.isTrue(res5.status);
       } catch (e) {
         assert.isTrue(false);
@@ -163,22 +163,22 @@ describe('# Threads test-suite', function () {
     });
     it('Downvote content', async function () {
       try {
-        const thread = new Blog({
+        const blog = new Blog({
           author: new bson.ObjectID(bson.ObjectID.generate()),
           content: 'upvote content'
         });
-        const res1 = await Blog.createBlog(thread, app.locals.blogCollection);
+        const res1 = await Blog.createBlog(blog, app.locals.blogCollection);
         assert.isTrue(res1.status);
         const user = new bson.ObjectID(bson.ObjectID.generate());
-        const res2 = await Blog.addDownvote(thread._id.toHexString(), user.toHexString(), app.locals.blogCollection);
+        const res2 = await Blog.addDownvote(blog._id.toHexString(), user.toHexString(), app.locals.blogCollection);
         assert.isTrue(res2.status);
-        const res3 = await Blog.addDownvote(thread._id.toHexString(), user.toHexString(), app.locals.blogCollection);
+        const res3 = await Blog.addDownvote(blog._id.toHexString(), user.toHexString(), app.locals.blogCollection);
         assert.isFalse(res3.status);
-        const res4 = await Blog.removeDownvote(thread._id.toHexString(), user.toHexString(), app.locals.blogCollection);
+        const res4 = await Blog.removeDownvote(blog._id.toHexString(), user.toHexString(), app.locals.blogCollection);
         assert.isTrue(res4.status);
-        const res6 = await Blog.removeDownvote(thread._id.toHexString(), user.toHexString(), app.locals.blogCollection);
+        const res6 = await Blog.removeDownvote(blog._id.toHexString(), user.toHexString(), app.locals.blogCollection);
         assert.isFalse(res6.status);
-        const res5 = await Blog.addDownvote(thread._id.toHexString(), user.toHexString(), app.locals.blogCollection);
+        const res5 = await Blog.addDownvote(blog._id.toHexString(), user.toHexString(), app.locals.blogCollection);
         assert.isTrue(res5.status);
       } catch (e) {
         assert.isTrue(false);

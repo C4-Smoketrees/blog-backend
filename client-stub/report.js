@@ -2,8 +2,8 @@ const fetch = require('node-fetch');
 const agent = require('./agent');
 const url = require('./url');
 
-async function threadReport (threadId, report, token) {
-  const res = await fetch(`${url}/reports/thread?threadId=${threadId}`, {
+async function blogReport (blogId, report, token) {
+  const res = await fetch(`${url}/reports/blog?blogId=${blogId}`, {
     method: 'POST',
     body: JSON.stringify({ report: report }), // { report: { reportReason: 1, description: 'lund' } }),
     headers: { 'Content-Type': 'application/json', Authorization: token },
@@ -25,6 +25,6 @@ async function commentReport (commentId, report, token) {
 }
 
 module.exports = {
-  threadReport,
+  blogReport,
   commentReport
 };
