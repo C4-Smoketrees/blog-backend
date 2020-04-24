@@ -24,6 +24,7 @@ class Reply {
     reply.downvotesCount = 0;
     reply.reports = [];
     reply.replies = [];
+    reply.threadId = id.threadId;
 
     let filter;
 
@@ -37,12 +38,12 @@ class Reply {
         }
       };
       let res;
-      if (id.threadId) {
-        filter = { _id: bson.ObjectID.createFromHexString(id.threadId) };
-        res = await threadCollection.updateOne(filter, query);
-      } else if (id.replyId) {
+      if (id.replyId) {
         filter = { _id: bson.ObjectID.createFromHexString(id.replyId) };
         res = await replyCollection.updateOne(filter, query);
+      } else if (id.threadId) {
+        filter = { _id: bson.ObjectID.createFromHexString(id.threadId) };
+        res = await threadCollection.updateOne(filter, query);
       } else {
         return { status: false, msg: 'threadId or replyId missing' };
       }
