@@ -442,6 +442,7 @@ class Blog {
     }
     return response;
   }
+
 }
 
 module.exports = Blog;
