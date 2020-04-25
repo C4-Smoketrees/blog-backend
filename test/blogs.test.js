@@ -3,16 +3,30 @@ const { describe, before, it, after } = require('mocha');
 const app = require('../app');
 const Blog = require('../modules/blogs/model');
 const bson = require('bson');
+const MongoClient = require('mongodb').MongoClient;
+const logger = require('../logging/logger');
 
 after(async function () {
   await app.locals.dbClient.close();
 });
 before(async function () {
-  await app.locals.dbClient;
-  try {
-    await app.locals.blogCollection.drop();
-  } catch (e) {
-  }
+  const dbConnectionString = 'mongodb://localhost:27017' || process.env.DB_CONN_STRING;
+  const dbConn = async () => {
+    try {
+      const dbPromise = MongoClient.connect(dbConnectionString, { useUnifiedTopology: true });
+      app.locals.dbClient = await dbPromise;
+      app.locals.db = await app.locals.dbClient.db('forum');
+      app.locals.blogCollection = await app.locals.db.collection('blogs');
+      app.locals.commentCollection = await app.locals.db.collection('comments');
+      app.locals.userCollection = await app.locals.db.collection('users');
+      app.locals.tagCollection = await app.locals.db.collection('tags');
+      await app.locals.blogCollection.createIndex({ content: 'text', title: 'text', tags: 'text' });
+    } catch (e) {
+      logger.warn(e);
+      process.exit(2);
+    }
+  };
+  return dbConn().then(() => { logger.info('Connection established to mongoDB'); });
 });
 describe('# Blogs test-suite', function () {
   describe('# Crud Operations', function () {
@@ -252,6 +266,10 @@ describe('# Blogs test-suite', function () {
       const res = await Blog.removeDownvote(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), new bson.ObjectID(bson.ObjectID.generate()).toHexString(), null);
       assert.isFalse(res.status);
       assert.isNotNull(res.err);
+    });
+    it('Search', async function () {
+      const res = await Blog.search('content', Date.now(), app.locals.blogCollection);
+      assert.isTrue(res.status);
     });
   });
 });

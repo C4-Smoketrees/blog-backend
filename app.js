@@ -19,6 +19,7 @@ const dbConn = async () => {
     app.locals.commentCollection = await app.locals.db.collection('comments');
     app.locals.userCollection = await app.locals.db.collection('users');
     app.locals.tagCollection = await app.locals.db.collection('tags');
+    await app.locals.blogCollection.createIndex({ content: 'text', title: 'text', tags: 'text' });
   } catch (e) {
     logger.warn(e);
     process.exit(2);

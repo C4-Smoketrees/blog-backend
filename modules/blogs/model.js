@@ -443,6 +443,63 @@ class Blog {
     return response;
   }
 
+  static async search (query, startTime, blogCollection, userId) {
+    console.log(startTime);
+    const filter = {
+      $text: {
+        $search: query
+      },
+      dateTime: { $lt: Number(startTime) }
+    };
+    let projection;
+    if (userId) {
+      projection = {
+        _id: 1,
+        content: 1,
+        title: 1,
+        tags: 1,
+        comments: 1,
+        reports: 1,
+        dateTime: 1,
+        upvotesCount: 1,
+        downvotesCount: 1,
+        stars: 1,
+        lastUpdate: 1,
+        upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
+      };
+    } else {
+      projection = {
+        _id: 1,
+        content: 1,
+        title: 1,
+        tags: 1,
+        comments: 1,
+        reports: 1,
+        dateTime: 1,
+        upvotesCount: 1,
+        downvotesCount: 1,
+        stars: 1,
+        lastUpdate: 1
+      };
+    }
+    const blogs = [];
+    let lastDate = startTime;
+    try {
+      const cursor = await blogCollection.find(filter, { projection: projection })
+        .sort({ dateTime: -1 })
+        .limit(50);
+      while (await cursor.hasNext()) {
+        const blog = await cursor.next();
+        blogs.push(blog);
+        lastDate = blog.dateTime;
+      }
+      return { status: true, blogs: blogs, lastDate: lastDate };
+    } catch (e) {
+      logger.error(e.message, { in: 'search', err: e.name });
+      return { status: false, err: e };
+    }
+  }
 }
 
 module.exports = Blog;
