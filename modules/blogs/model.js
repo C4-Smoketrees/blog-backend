@@ -214,7 +214,7 @@ class Blog {
       let doc;
       const blogs = [];
       let length = 0;
-      const res = await blogCollection.find({}, { projection: projection });
+      const res = await blogCollection.find({}, { projection: projection }).sort({ dateTime: -1 }).limit(10);
       while (await res.hasNext()) {
         doc = await res.next();
         blogs.push(doc);
