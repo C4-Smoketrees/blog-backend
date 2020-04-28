@@ -1,5 +1,5 @@
-const bson = require('bson');
-const logger = require('../../logging/logger');
+const bson = require('bson')
+const logger = require('../../logging/logger')
 
 /**
  * @typedef {{status:boolean,id:string|undefined}} DatabaseWriteResponse
@@ -27,20 +27,21 @@ class Blog {
    * @param {number=time.now()} blog.astUpdate Last updated
    */
   constructor (blog) {
-    this._id = blog._id;
-    this.content = blog.content;
-    this.title = blog.title;
-    this.replies = blog.replies;
-    this.reports = blog.reports;
-    this.dateTime = blog.dateTime;
-    this.upvotesCount = blog.upvotesCount;
-    this.downvotesCount = blog.downvotesCount;
-    this.upvotes = blog.upvotes;
-    this.downvotes = blog.downvotes;
-    this.author = blog.author;
-    this.stars = blog.stars;
-    this.lastUpdate = blog.lastUpdate;
-    this.tags = blog.tags;
+    this._id = blog._id
+    this.content = blog.content
+    this.title = blog.title
+    this.replies = blog.replies
+    this.reports = blog.reports
+    this.dateTime = blog.dateTime
+    this.upvotesCount = blog.upvotesCount
+    this.downvotesCount = blog.downvotesCount
+    this.upvotes = blog.upvotes
+    this.downvotes = blog.downvotes
+    this.author = blog.author
+    this.stars = blog.stars
+    this.lastUpdate = blog.lastUpdate
+    this.tags = blog.tags
+    this.authorName = blog.authorName
   }
 
   /**
@@ -52,30 +53,30 @@ class Blog {
   static createBlog (blog, blogCollection) {
     const func = async () => {
       try {
-        blog._id = new bson.ObjectID(bson.ObjectID.generate());
-        blog.replies = [];
-        blog.reports = [];
-        blog.dateTime = Date.now();
-        blog.upvotes = [];
-        blog.downvotes = [];
-        blog.upvotesCount = 0;
-        blog.downvotesCount = 0;
-        blog.stars = 0;
-        blog.lastUpdate = Date.now();
-        await blogCollection.insertOne(blog);
+        blog._id = new bson.ObjectID(bson.ObjectID.generate())
+        blog.replies = []
+        blog.reports = []
+        blog.dateTime = Date.now()
+        blog.upvotes = []
+        blog.downvotes = []
+        blog.upvotesCount = 0
+        blog.downvotesCount = 0
+        blog.stars = 0
+        blog.lastUpdate = Date.now()
+        await blogCollection.insertOne(blog)
         const response = {
           status: true,
           blogId: blog._id.toHexString()
-        };
-        logger.debug(`Insert new blog with id:${response.blogId}`);
-        return response;
+        }
+        logger.debug(`Insert new blog with id:${response.blogId}`)
+        return response
       } catch (e) {
-        const response = { status: false, err: e };
-        logger.error('Error creating new blog', { err: e });
-        return response;
+        const response = { status: false, err: e }
+        logger.error('Error creating new blog', { err: e })
+        return response
       }
-    };
-    return func();
+    }
+    return func()
   }
 
   /**
@@ -86,38 +87,38 @@ class Blog {
    * @returns {Promise} A promise that always resolves
    */
   static updateBlogContent (blog, userId, blogCollection) {
-    const filter = { _id: blog._id, author: bson.ObjectID.createFromHexString(userId) };
-    blog.lastUpdate = Date.now();
+    const filter = { _id: blog._id, author: bson.ObjectID.createFromHexString(userId) }
+    blog.lastUpdate = Date.now()
     const query = {
       $set: {
         title: blog.title,
         content: blog.content,
         tags: blog.tags
       }
-    };
+    }
 
     const func = async () => {
       try {
-        const res = await blogCollection.updateOne(filter, query, {});
-        let response;
+        const res = await blogCollection.updateOne(filter, query, {})
+        let response
         if (res.modifiedCount === 1) {
           response = {
             status: true,
             blogId: blog._id.toHexString()
-          };
-          logger.debug(`Updated content for blog with id: ${response.blogId}`);
+          }
+          logger.debug(`Updated content for blog with id: ${response.blogId}`)
         } else {
-          response = { status: false, id: blog._id.toHexString() };
-          logger.error(JSON.stringify({ id: blog._id.toHexString(), matches: res.matchedCount }));
+          response = { status: false, id: blog._id.toHexString() }
+          logger.error(JSON.stringify({ id: blog._id.toHexString(), matches: res.matchedCount }))
         }
-        return response;
+        return response
       } catch (e) {
-        const response = { status: false };
-        logger.error(`Error in updating blog with id: ${blog._id}`);
-        return response;
+        const response = { status: false }
+        logger.error(`Error in updating blog with id: ${blog._id}`)
+        return response
       }
-    };
-    return func();
+    }
+    return func()
   }
 
   /**
@@ -128,9 +129,9 @@ class Blog {
    * @returns {Promise}  Promise always resolves
    */
   static readBlogUsingId (id, blogCollection, userId) {
-    const objectId = bson.ObjectID.createFromHexString(id);
-    const filter = { _id: objectId };
-    let projection;
+    const objectId = bson.ObjectID.createFromHexString(id)
+    const filter = { _id: objectId }
+    let projection
     if (userId) {
       projection = {
         _id: 1,
@@ -145,8 +146,9 @@ class Blog {
         stars: 1,
         lastUpdate: 1,
         upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
-        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
-      };
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        coverImage: 1
+      }
     } else {
       projection = {
         _id: 1,
@@ -159,26 +161,27 @@ class Blog {
         upvotesCount: 1,
         downvotesCount: 1,
         stars: 1,
-        lastUpdate: 1
-      };
+        lastUpdate: 1,
+        coverImage: 1
+      }
     }
     const func = async () => {
       try {
-        const dbRes = await blogCollection.findOne(filter, { projection: projection });
-        const res = { status: true, blog: await dbRes };
-        logger.debug(`Read blog with id: ${res.blog._id.toHexString()}`);
-        return res;
+        const dbRes = await blogCollection.findOne(filter, { projection: projection })
+        const res = { status: true, blog: await dbRes }
+        logger.debug(`Read blog with id: ${res.blog._id.toHexString()}`)
+        return res
       } catch (e) {
-        const res = { status: false };
-        logger.error(JSON.stringify({ msg: `Error in reading the document with id : ${id}`, err: e }));
-        return res;
+        const res = { status: false }
+        logger.error(JSON.stringify({ msg: `Error in reading the document with id : ${id}`, err: e }))
+        return res
       }
-    };
-    return func();
+    }
+    return func()
   }
 
   static async readAllBlogs (blogCollection, userId) {
-    let projection;
+    let projection
     if (userId) {
       projection = {
         _id: 1,
@@ -192,9 +195,11 @@ class Blog {
         downvotesCount: 1,
         stars: 1,
         lastUpdate: 1,
+        authorName: 1,
         upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
-        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
-      };
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        coverImage: 1
+      }
     } else {
       projection = {
         _id: 1,
@@ -207,24 +212,26 @@ class Blog {
         upvotesCount: 1,
         downvotesCount: 1,
         stars: 1,
-        lastUpdate: 1
-      };
+        lastUpdate: 1,
+        authorName: 1,
+        coverImage: 1
+      }
     }
     try {
-      let doc;
-      const blogs = [];
-      let length = 0;
-      const res = await blogCollection.find({}, { projection: projection }).sort({ dateTime: -1 }).limit(10);
+      let doc
+      const blogs = []
+      let length = 0
+      const res = await blogCollection.find({}, { projection: projection }).sort({ dateTime: -1 }).limit(10)
       while (await res.hasNext()) {
-        doc = await res.next();
-        blogs.push(doc);
-        length += 1;
+        doc = await res.next()
+        blogs.push(doc)
+        length += 1
       }
-      return { status: true, blogs: blogs, length: length };
+      return { status: true, blogs: blogs, length: length }
     } catch (e) {
-      const res = { status: false };
-      logger.error(JSON.stringify({ msg: 'Error in reading all blogs', err: e }));
-      return res;
+      const res = { status: false }
+      logger.error(JSON.stringify({ msg: 'Error in reading all blogs', err: e }))
+      return res
     }
   }
 
@@ -235,39 +242,39 @@ class Blog {
    * @returns {Promise} Always resolves
    */
   static deleteBlogUsingId (id, blogCollection) {
-    const objectId = bson.ObjectID.createFromHexString(id);
-    const filter = { _id: objectId };
+    const objectId = bson.ObjectID.createFromHexString(id)
+    const filter = { _id: objectId }
     const func = async () => {
       try {
-        const res = await blogCollection.deleteOne(filter);
-        let response;
+        const res = await blogCollection.deleteOne(filter)
+        let response
         if (res.deletedCount === 1) {
-          response = { status: true, blogId: id };
-          logger.debug(`Deleted blog id: ${id}`);
+          response = { status: true, blogId: id }
+          logger.debug(`Deleted blog id: ${id}`)
         } else {
-          response = { status: false };
+          response = { status: false }
         }
-        return response;
+        return response
       } catch (e) {
-        const response = { status: false, err: e };
-        logger.error(JSON.stringify({ msg: `Error in deleting the document of id : ${id}`, err: e }));
-        return response;
+        const response = { status: false, err: e }
+        logger.error(JSON.stringify({ msg: `Error in deleting the document of id : ${id}`, err: e }))
+        return response
       }
-    };
-    return func();
+    }
+    return func()
   }
 
   static async readAllTags (tagCollection) {
     try {
-      const res = await tagCollection.findOne({});
+      const res = await tagCollection.findOne({})
       if (!res) {
-        return { status: false };
+        return { status: false }
       }
-      const tags = res.tags;
-      return { status: true, tags: tags };
+      const tags = res.tags
+      return { status: true, tags: tags }
     } catch (e) {
-      logger.error('Error in reading the tags', { err: e });
-      return { status: false, err: e };
+      logger.error('Error in reading the tags', { err: e })
+      return { status: false, err: e }
     }
   }
 
@@ -279,168 +286,168 @@ class Blog {
    * @returns {Promise<DatabaseWriteResponse>} Promise always resolves
    */
   static updateStars (id, command, blogCollection) {
-    const objectId = new bson.ObjectID(bson.ObjectID.createFromHexString(id));
+    const objectId = new bson.ObjectID(bson.ObjectID.createFromHexString(id))
 
-    const filter = { _id: objectId };
-    let query;
+    const filter = { _id: objectId }
+    let query
     if (command === 'inc') {
-      query = { $inc: { stars: 1 } };
+      query = { $inc: { stars: 1 } }
     } else if (command === 'dec') {
-      query = { $inc: { stars: -1 } };
+      query = { $inc: { stars: -1 } }
     } else {
-      throw new Error('Illegal Command');
+      throw new Error('Illegal Command')
     }
 
     const func = async () => {
       try {
-        const result = await blogCollection.updateOne(filter, query);
-        let response;
+        const result = await blogCollection.updateOne(filter, query)
+        let response
         if (result.modifiedCount === 1) {
-          response = { status: true, blogId: id };
-          logger.debug(`Incremented star for the id: ${id}`);
+          response = { status: true, blogId: id }
+          logger.debug(`Incremented star for the id: ${id}`)
         } else {
-          response = { status: false, blogId: id };
-          logger.warn(`Error in incrementing star for id: ${id} modified:${result.modifiedCount} match: ${result.matchedCount}`);
+          response = { status: false, blogId: id }
+          logger.warn(`Error in incrementing star for id: ${id} modified:${result.modifiedCount} match: ${result.matchedCount}`)
         }
-        return response;
+        return response
       } catch (e) {
-        const response = { status: false, err: e };
-        logger.error(JSON.stringify({ msg: `Error in incrementing start for id : ${id}`, err: e }));
-        return response;
+        const response = { status: false, err: e }
+        logger.error(JSON.stringify({ msg: `Error in incrementing start for id : ${id}`, err: e }))
+        return response
       }
-    };
+    }
 
-    return func();
+    return func()
   }
 
   static async readBlogByTag (tag, blogCollection) {
     try {
-      const filter = { tags: tag };
-      const res = await blogCollection.find(filter);
-      const blogs = [];
-      let doc;
+      const filter = { tags: tag }
+      const res = await blogCollection.find(filter)
+      const blogs = []
+      let doc
       while (await res.hasNext()) {
-        doc = await res.next();
-        blogs.push(doc);
+        doc = await res.next()
+        blogs.push(doc)
       }
-      return { status: true, blogs: blogs };
+      return { status: true, blogs: blogs }
     } catch (e) {
-      const res = { status: false, err: e };
-      logger.error(JSON.stringify({ msg: 'Error in reading all blogs', err: e }));
-      return res;
+      const res = { status: false, err: e }
+      logger.error(JSON.stringify({ msg: 'Error in reading all blogs', err: e }))
+      return res
     }
   }
 
   static async addUpvote (blogId, userId, blogCollection) {
-    const filter = { _id: bson.ObjectID.createFromHexString(blogId) };
-    let query = { $addToSet: { upvotes: bson.ObjectID.createFromHexString(userId) } };
+    const filter = { _id: bson.ObjectID.createFromHexString(blogId) }
+    let query = { $addToSet: { upvotes: bson.ObjectID.createFromHexString(userId) } }
 
-    let response;
+    let response
     try {
-      const res = await blogCollection.updateOne(filter, query);
+      const res = await blogCollection.updateOne(filter, query)
       if (res.modifiedCount === 1) {
-        query = { $inc: { upvotesCount: 1 } };
-        await blogCollection.updateOne(filter, query);
+        query = { $inc: { upvotesCount: 1 } }
+        await blogCollection.updateOne(filter, query)
         response = {
           status: true
-        };
+        }
       } else {
         response = {
           status: false
-        };
+        }
       }
     } catch (e) {
       response = {
         status: false,
         err: e
-      };
-      logger.error(`Error in upvoting blog: ${blogId} error:${e.message}`);
+      }
+      logger.error(`Error in upvoting blog: ${blogId} error:${e.message}`)
     }
-    return response;
+    return response
   }
 
   static async addDownvote (blogId, userId, blogCollection) {
-    const filter = { _id: bson.ObjectID.createFromHexString(blogId) };
-    let query = { $addToSet: { downvotes: bson.ObjectID.createFromHexString(userId) } };
+    const filter = { _id: bson.ObjectID.createFromHexString(blogId) }
+    let query = { $addToSet: { downvotes: bson.ObjectID.createFromHexString(userId) } }
 
-    let response;
+    let response
     try {
-      const res = await blogCollection.updateOne(filter, query);
+      const res = await blogCollection.updateOne(filter, query)
       if (res.modifiedCount === 1) {
-        query = { $inc: { downvotesCount: 1 } };
-        await blogCollection.updateOne(filter, query);
+        query = { $inc: { downvotesCount: 1 } }
+        await blogCollection.updateOne(filter, query)
         response = {
           status: true
-        };
+        }
       } else {
         response = {
           status: false
-        };
+        }
       }
     } catch (e) {
       response = {
         status: false,
         err: e
-      };
-      logger.error(`Error in upvoting blog: ${blogId} error:${e.message}`);
+      }
+      logger.error(`Error in upvoting blog: ${blogId} error:${e.message}`)
     }
-    return response;
+    return response
   }
 
   static async removeDownvote (blogId, userId, blogCollection) {
-    const filter = { _id: bson.ObjectID.createFromHexString(blogId) };
-    let query = { $pull: { downvotes: bson.ObjectID.createFromHexString(userId) } };
+    const filter = { _id: bson.ObjectID.createFromHexString(blogId) }
+    let query = { $pull: { downvotes: bson.ObjectID.createFromHexString(userId) } }
 
-    let response;
+    let response
     try {
-      const res = await blogCollection.updateOne(filter, query);
+      const res = await blogCollection.updateOne(filter, query)
       if (res.modifiedCount === 1) {
-        query = { $inc: { downvotesCount: -1 } };
-        await blogCollection.updateOne(filter, query);
+        query = { $inc: { downvotesCount: -1 } }
+        await blogCollection.updateOne(filter, query)
         response = {
           status: true
-        };
+        }
       } else {
         response = {
           status: false
-        };
+        }
       }
     } catch (e) {
       response = {
         status: false,
         err: e
-      };
-      logger.error(`Error in removing downvote: ${blogId} error:${e.message}`);
+      }
+      logger.error(`Error in removing downvote: ${blogId} error:${e.message}`)
     }
-    return response;
+    return response
   }
 
   static async removeUpvote (blogId, userId, blogCollection) {
-    const filter = { _id: bson.ObjectID.createFromHexString(blogId) };
-    let query = { $pull: { upvotes: bson.ObjectID.createFromHexString(userId) } };
+    const filter = { _id: bson.ObjectID.createFromHexString(blogId) }
+    let query = { $pull: { upvotes: bson.ObjectID.createFromHexString(userId) } }
 
-    let response;
+    let response
     try {
-      const res = await blogCollection.updateOne(filter, query);
+      const res = await blogCollection.updateOne(filter, query)
       if (res.modifiedCount === 1) {
-        query = { $inc: { upvotesCount: -1 } };
-        await blogCollection.updateOne(filter, query);
+        query = { $inc: { upvotesCount: -1 } }
+        await blogCollection.updateOne(filter, query)
         response = {
           status: true
-        };
+        }
       } else {
         response = {
           status: false
-        };
+        }
       }
     } catch (e) {
       response = {
         status: false,
         err: e
-      };
-      logger.error(`Error in removing upvote: ${blogId} error:${e.message}`);
+      }
+      logger.error(`Error in removing upvote: ${blogId} error:${e.message}`)
     }
-    return response;
+    return response
   }
 
   static async search (query, startTime, blogCollection, userId) {
@@ -449,8 +456,8 @@ class Blog {
         $search: query
       },
       dateTime: { $lt: Number(startTime) }
-    };
-    let projection;
+    }
+    let projection
     if (userId) {
       projection = {
         _id: 1,
@@ -465,8 +472,10 @@ class Blog {
         stars: 1,
         lastUpdate: 1,
         upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
-        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
-      };
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        authorName: 1,
+        coverImage: 1
+      }
     } else {
       projection = {
         _id: 1,
@@ -479,26 +488,28 @@ class Blog {
         upvotesCount: 1,
         downvotesCount: 1,
         stars: 1,
-        lastUpdate: 1
-      };
+        lastUpdate: 1,
+        authorName: 1,
+        coverImage: 1,
+      }
     }
-    const blogs = [];
-    let lastDate = startTime;
+    const blogs = []
+    let lastDate = startTime
     try {
       const cursor = await blogCollection.find(filter, { projection: projection })
         .sort({ dateTime: -1 })
-        .limit(50);
+        .limit(50)
       while (await cursor.hasNext()) {
-        const blog = await cursor.next();
-        blogs.push(blog);
-        lastDate = blog.dateTime;
+        const blog = await cursor.next()
+        blogs.push(blog)
+        lastDate = blog.dateTime
       }
-      return { status: true, blogs: blogs, lastDate: lastDate };
+      return { status: true, blogs: blogs, lastDate: lastDate }
     } catch (e) {
-      logger.error(e.message, { in: 'search', err: e.name });
-      return { status: false, err: e };
+      logger.error(e.message, { in: 'search', err: e.name })
+      return { status: false, err: e }
     }
   }
 }
 
-module.exports = Blog;
+module.exports = Blog
