@@ -444,7 +444,6 @@ class Blog {
   }
 
   static async search (query, startTime, blogCollection, userId) {
-    console.log(startTime);
     const filter = {
       $text: {
         $search: query

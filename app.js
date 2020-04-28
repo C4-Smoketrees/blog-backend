@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 const app = require('express')();
 const MongoClient = require('mongodb').MongoClient;
 
@@ -15,7 +15,7 @@ const dbConn = async () => {
   try {
     const dbPromise = MongoClient.connect(dbConnectionString, { useUnifiedTopology: true });
     app.locals.dbClient = await dbPromise;
-    app.locals.db = await app.locals.dbClient.db('forum');
+    app.locals.db = await app.locals.dbClient.db('blogs');
     app.locals.blogCollection = await app.locals.db.collection('blogs');
     app.locals.commentCollection = await app.locals.db.collection('comments');
     app.locals.userCollection = await app.locals.db.collection('users');

@@ -42,6 +42,7 @@ router.get('/one', jwtAuth, async (req, res) => {
 });
 
 router.post('/update', jwtAuth, async (req, res) => {
+  console.log(req.body);
   if (!req.body.draft) {
     res.status(401).json({ msg: 'Fields missing' });
     return;
