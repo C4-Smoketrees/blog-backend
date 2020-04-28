@@ -42,6 +42,7 @@ class Blog {
     this.lastUpdate = blog.lastUpdate;
     this.tags = blog.tags;
     this.authorName = blog.authorName;
+    this.coverImage = blog.coverImage;
   }
 
   /**
@@ -93,7 +94,8 @@ class Blog {
       $set: {
         title: blog.title,
         content: blog.content,
-        tags: blog.tags
+        tags: blog.tags,
+        coverImage: blog.coverImage
       }
     };
 

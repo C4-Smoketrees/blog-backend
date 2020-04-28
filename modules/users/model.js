@@ -61,7 +61,8 @@ class User {
         $set: {
           'drafts.$.content': draft.content,
           'drafts.$.title': draft.title,
-          'drafts.$.tags': draft.tags
+          'drafts.$.tags': draft.tags,
+          'drafts.$.coverImage': draft.coverImage
         }
       };
 
