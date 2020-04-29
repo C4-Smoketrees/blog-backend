@@ -150,7 +150,8 @@ class Blog {
         upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
         downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
         coverImage: 1,
-        authorName: 1
+        authorName: 1,
+        author: 1
       };
     } else {
       projection = {
@@ -166,7 +167,8 @@ class Blog {
         stars: 1,
         lastUpdate: 1,
         coverImage: 1,
-        authorName: 1
+        authorName: 1,
+        author: 1
       };
     }
     const func = async () => {
@@ -202,7 +204,8 @@ class Blog {
         authorName: 1,
         upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
         downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
-        coverImage: 1
+        coverImage: 1,
+        author: 1
       };
     } else {
       projection = {
@@ -218,7 +221,8 @@ class Blog {
         stars: 1,
         lastUpdate: 1,
         authorName: 1,
-        coverImage: 1
+        coverImage: 1,
+        author: 1
       };
     }
     try {
@@ -478,7 +482,8 @@ class Blog {
         upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
         downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
         authorName: 1,
-        coverImage: 1
+        coverImage: 1,
+        author: 1
       };
     } else {
       projection = {
@@ -494,7 +499,8 @@ class Blog {
         stars: 1,
         lastUpdate: 1,
         authorName: 1,
-        coverImage: 1
+        coverImage: 1,
+        author: 1
       };
     }
     const blogs = [];
