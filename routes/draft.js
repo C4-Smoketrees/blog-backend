@@ -8,7 +8,6 @@ router.post('/new', jwtAuth, async (req, res) => {
     res.status(401).json({ msg: 'Fields missing' });
     return;
   }
-  console.log(req.body);
   const draft = req.body.draft;
   draft.authorName = `${req.user.firstName} ${req.user.lastName}`;
   const response = await User.createDraft(req.userId, draft, req.app.locals.userCollection, req.app.locals.tagCollection);
@@ -44,7 +43,6 @@ router.get('/one', jwtAuth, async (req, res) => {
 });
 
 router.post('/update', jwtAuth, async (req, res) => {
-  console.log(req.body);
   if (!req.body.draft) {
     res.status(401).json({ msg: 'Fields missing' });
     return;
